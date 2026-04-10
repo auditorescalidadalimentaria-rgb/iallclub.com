@@ -724,7 +724,7 @@
   <p style="color: var(--muted); font-size: 0.8rem;">Mendoza, Argentina</p>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
   // Scroll reveal
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry, i) => {
@@ -740,4 +740,13 @@
   document.addEventListener('mousemove', (e) => {
     const x = (e.clientX / window.innerWidth - 0.5) * 20;
     const y = (e.clientY / window.innerHeight - 0.5) * 20;
-    document.querySelector('.orb1').style.transform = `translate(${x * 0.
+    const orb1 = document.querySelector('.orb1');
+    const orb2 = document.querySelector('.orb2');
+    const orb3 = document.querySelector('.orb3');
+    if(orb1) orb1.style.transform = `translate(${x * 0.5}px, ${y * 0.5}px) scale(1)`;
+    if(orb2) orb2.style.transform = `translate(${x * -0.3}px, ${y * -0.3}px) scale(1)`;
+    if(orb3) orb3.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px) scale(1)`;
+  });
+</script>
+</body>
+</html>
