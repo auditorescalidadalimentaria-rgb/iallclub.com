@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iall Club</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #0f0f1a;
+    --bg3: #141428;
+    --card: #1a1a2e;
+    --border: #2a2a4a;
+    --cyan: #00d4ff;
+    --purple: #8b5cf6;
+    --green: #10b981;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --grad: linear-gradient(135deg, #00d4ff, #8b5cf6);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',sans-serif; min-height:100vh; }
+
+  /* LOGIN */
+  #login-screen {
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background: radial-gradient(ellipse at 50% 50%, #1a0a2e 0%, #0a0a0f 70%);
+  }
+  .login-box {
+    background:var(--card); border:1px solid var(--border); border-radius:16px;
+    padding:40px; width:380px; text-align:center;
+  }
+  .login-logo { font-size:28px; font-weight:900; background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:4px; }
+  .login-sub { color:var(--text2); font-size:13px; margin-bottom:32px; }
+  .login-box input {
+    width:100%; padding:12px 16px; background:var(--bg3); border:1px solid var(--border);
+    border-radius:8px; color:var(--text); font-size:14px; margin-bottom:12px; outline:none;
+    transition:.2s;
+  }
+  .login-box input:focus { border-color:var(--cyan); }
+  .btn-primary {
+    width:100%; padding:12px; background:var(--grad); border:none; border-radius:8px;
+    color:#fff; font-size:15px; font-weight:700; cursor:pointer; transition:.2s;
+  }
+  .btn-primary:hover { opacity:.85; }
+  .login-err { color:var(--red); font-size:13px; margin-top:10px; min-height:20px; }
+
+  /* MAIN APP */
+  #app { display:none; min-height:100vh; }
+  .topbar {
+    background:var(--bg2); border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 24px; height:56px; position:sticky; top:0; z-index:100;
+  }
+  .topbar-logo { font-size:18px; font-weight:900; background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .topbar-right { display:flex; align-items:center; gap:16px; }
+  .topbar-user { font-size:13px; color:var(--text2); }
+  .btn-sm {
+    padding:6px 14px; border-radius:6px; border:1px solid var(--border);
+    background:transparent; color:var(--text2); font-size:12px; cursor:pointer; transition:.2s;
+  }
+  .btn-sm:hover { border-color:var(--cyan); color:var(--cyan); }
+
+  .main-layout { display:flex; min-height:calc(100vh - 56px); }
+  .sidebar {
+    width:220px; background:var(--bg2); border-right:1px solid var(--border);
+    padding:20px 12px; display:flex; flex-direction:column; gap:4px;
+    position:sticky; top:56px; height:calc(100vh - 56px); overflow-y:auto;
+  }
+  .sidebar-title { font-size:10px; color:var(--text2); text-transform:uppercase; letter-spacing:1px; padding:8px 12px 4px; }
+  .nav-item {
+    padding:10px 12px; border-radius:8px; cursor:pointer; transition:.2s;
+    font-size:13px; color:var(--text2); display:flex; align-items:center; gap:10px;
+    border:1px solid transparent;
+  }
+  .nav-item:hover { background:var(--bg3); color:var(--text); }
+  .nav-item.active { background:var(--bg3); color:var(--cyan); border-color:var(--border); }
+  .nav-item .icon { font-size:16px; width:20px; text-align:center; }
+
+  .content { flex:1; padding:28px; overflow-y:auto; }
+
+  /* CARDS */
+  .page-title { font-size:22px; font-weight:700; margin-bottom:4px; }
+  .page-sub { color:var(--text2); font-size:13px; margin-bottom:24px; }
+  .cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:16px; margin-bottom:28px; }
+  .kpi-card {
+    background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px;
+  }
+  .kpi-label { font-size:11px; color:var(--text2); text-transform:uppercase; letter-spacing:.5px; }
+  .kpi-value { font-size:28px; font-weight:800; margin-top:4px; }
+  .kpi-value.cyan { color:var(--cyan); }
+  .kpi-value.purple { color:var(--purple); }
+  .kpi-value.green { color:var(--green); }
+  .kpi-value.red { color:var(--red); }
+
+  /* TABLES */
+  .table-wrap { background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+  .table-header { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .table-header h3 { font-size:15px; font-weight:600; }
+  table { width:100%; border-collapse:collapse; }
+  th { padding:12px 16px; text-align:left; font-size:11px; color:var(--text2); text-transform:uppercase; letter-spacing:.5px; border-bottom:1px solid var(--border); }
+  td { padding:12px 16px; font-size:13px; border-bottom:1px solid rgba(255,255,255,.04); }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:rgba(255,255,255,.02); }
+
+  .badge {
+    display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600;
+  }
+  .badge.green { background:rgba(16,185,129,.15); color:var(--green); }
+  .badge.red { background:rgba(239,68,68,.15); color:var(--red); }
+  .badge.yellow { background:rgba(245,158,11,.15); color:var(--yellow); }
+  .badge.cyan { background:rgba(0,212,255,.15); color:var(--cyan); }
+  .badge.purple { background:rgba(139,92,246,.15); color:var(--purple); }
+
+  /* MODAL */
+  .modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,.7); display:flex;
+    align-items:center; justify-content:center; z-index:1000; display:none;
+  }
+  .modal-overlay.open { display:flex; }
+  .modal {
+    background:var(--card); border:1px solid var(--border); border-radius:16px;
+    padding:28px; width:460px; max-width:95vw; max-height:90vh; overflow-y:auto;
+  }
+  .modal h3 { font-size:17px; font-weight:700; margin-bottom:20px; }
+  .form-group { margin-bottom:14px; }
+  .form-group label { display:block; font-size:12px; color:var(--text2); margin-bottom:6px; }
+  .form-group input, .form-group select {
+    width:100%; padding:10px 14px; background:var(--bg3); border:1px solid var(--border);
+    border-radius:8px; color:var(--text); font-size:13px; outline:none;
+  }
+  .form-group input:focus, .form-group select:focus { border-color:var(--cyan); }
+  .modal-actions { display:flex; gap:10px; margin-top:20px; }
+  .btn-cancel { flex:1; padding:10px; background:transparent; border:1px solid var(--border); border-radius:8px; color:var(--text2); cursor:pointer; }
+  .btn-save { flex:2; padding:10px; background:var(--grad); border:none; border-radius:8px; color:#fff; font-weight:700; cursor:pointer; }
+
+  /* MÓDULOS GRID */
+  .modules-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; }
+  .module-card {
+    background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px;
+    cursor:pointer; transition:.2s; text-align:center;
+  }
+  .module-card:hover { border-color:var(--cyan); transform:translateY(-2px); }
+  .module-card.locked { opacity:.4; cursor:not-allowed; }
+  .module-card.locked:hover { transform:none; border-color:var(--border); }
+  .module-icon { font-size:36px; margin-bottom:12px; }
+  .module-name { font-size:14px; font-weight:700; margin-bottom:4px; }
+  .module-desc { font-size:11px; color:var(--text2); }
+
+  /* MÓDULO ABIERTO */
+  .module-view { display:none; }
+  .module-view.open { display:block; }
+  .module-back { display:flex; align-items:center; gap:8px; color:var(--cyan); cursor:pointer; font-size:13px; margin-bottom:20px; }
+
+  /* SUSPENDIDO */
+  .suspended-banner {
+    background:rgba(239,68,68,.1); border:1px solid var(--red); border-radius:12px;
+    padding:20px 24px; margin-bottom:24px; display:flex; align-items:center; gap:16px;
+  }
+
+  /* ADMIN TABS */
+  .tabs { display:flex; gap:4px; margin-bottom:24px; background:var(--bg2); padding:4px; border-radius:10px; width:fit-content; }
+  .tab { padding:8px 18px; border-radius:8px; cursor:pointer; font-size:13px; color:var(--text2); transition:.2s; }
+  .tab.active { background:var(--card); color:var(--cyan); }
+
+  .action-btn { padding:6px 12px; border-radius:6px; border:none; cursor:pointer; font-size:12px; font-weight:600; transition:.2s; }
+  .action-btn.edit { background:rgba(0,212,255,.1); color:var(--cyan); }
+  .action-btn.del { background:rgba(239,68,68,.1); color:var(--red); }
+  .action-btn.pay { background:rgba(16,185,129,.1); color:var(--green); }
+  .action-btn:hover { opacity:.7; }
+
+  .loading { text-align:center; padding:40px; color:var(--text2); }
+  .empty { text-align:center; padding:40px; color:var(--text2); font-size:13px; }
+
+  .backup-btn {
+    padding:10px 20px; background:rgba(139,92,246,.15); border:1px solid var(--purple);
+    border-radius:8px; color:var(--purple); cursor:pointer; font-size:13px; font-weight:600;
+  }
+  .backup-btn:hover { background:rgba(139,92,246,.25); }
+
+  .modulos-check { display:flex; flex-wrap:wrap; gap:10px; }
+  .mod-check { display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; }
+  .mod-check input { cursor:pointer; accent-color:var(--cyan); }
+
+  #toast {
+    position:fixed; bottom:24px; right:24px; background:var(--card); border:1px solid var(--border);
+    border-radius:10px; padding:12px 20px; font-size:13px; z-index:9999;
+    transform:translateY(100px); opacity:0; transition:.3s;
+  }
+  #toast.show { transform:translateY(0); opacity:1; }
+  #toast.success { border-color:var(--green); color:var(--green); }
+  #toast.error { border-color:var(--red); color:var(--red); }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">iall Club</div>
+    <div class="login-sub">Intelligent Operational Systems</div>
+    <input type="email" id="login-email" placeholder="Email" />
+    <input type="password" id="login-pass" placeholder="Contraseña" />
+    <button class="btn-primary" onclick="doLogin()">Ingresar</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-logo">iall Club</div>
+    <div class="topbar-right">
+      <span class="topbar-user" id="topbar-user"></span>
+      <button class="btn-sm" onclick="doLogout()">Salir</button>
+    </div>
+  </div>
+  <div class="main-layout">
+    <div class="sidebar" id="sidebar"></div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal-body"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SUPA_URL = 'https://smldkvlmmzlgpxrtfesz.supabase.co';
+const SUPA_KEY = 'sb_publishable_HGeSd7TgEqn53VUrltY-Tg_OW_ERXQ8';
+
+let STATE = { user: null, cliente: null, page: 'dashboard', moduleOpen: null };
+
+// ── API helpers ──────────────────────────────────────────
+async function api(path, method='GET', body=null) {
+  try {
+    const opts = {
+      method,
+      headers: { 'Content-Type':'application/json', 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
+    };
+    if (body) opts.body = JSON.stringify(body);
+    const r = await fetch(SUPA_URL + '/rest/v1/' + path, opts);
+    if (!r.ok) { const e = await r.json(); throw new Error(e.message || r.status); }
+    const txt = await r.text();
+    return txt ? JSON.parse(txt) : [];
+  } catch(e) { console.error('API error:', e); throw e; }
+}
+
+function toast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show ' + type;
+  setTimeout(() => t.className = '', 3000);
+}
+
+// ── LOGIN ────────────────────────────────────────────────
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  const err   = document.getElementById('login-err');
+  err.textContent = '';
+  if (!email || !pass) { err.textContent = 'Completá todos los campos'; return; }
+  try {
+    const users = await api(`usuarios?email=eq.${encodeURIComponent(email)}&select=*`);
+    if (!users.length) { err.textContent = 'Usuario no encontrado'; return; }
+    const u = users[0];
+    // Password check: stored as plain or bcrypt
+    let ok = false;
+    if (u.password_hash) {
+      ok = u.password_hash === pass || (typeof dcodeIO !== 'undefined' && dcodeIO.bcrypt.compareSync(pass, u.password_hash));
+    } else {
+      // First login — set password
+      ok = true;
+      await api(`usuarios?id=eq.${u.id}`, 'PATCH', { password_hash: pass });
+    }
+    if (!ok) { err.textContent = 'Contraseña incorrecta'; return; }
+    if (!u.activo) { err.textContent = 'Usuario desactivado'; return; }
+
+    STATE.user = u;
+    // Check suspension for clientes
+    if (u.rol === 'cliente') {
+      const clientes = await api(`clientes?usuario_id=eq.${u.id}&select=*`);
+      if (clientes.length) {
+        STATE.cliente = clientes[0];
+        const suspended = await checkSuspension(clientes[0].id);
+        STATE.suspended = suspended;
+      }
+    }
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('topbar-user').textContent = u.nombre + ' · ' + u.rol;
+    renderSidebar();
+    renderPage('dashboard');
+  } catch(e) { err.textContent = 'Error: ' + e.message; }
+}
+
+async function checkSuspension(clienteId) {
+  try {
+    const pagos = await api(`pagos?cliente_id=eq.${clienteId}&pagado=eq.false&order=anio.desc,mes.desc&select=*`);
+    return pagos.length >= 2;
+  } catch { return false; }
+}
+
+function doLogout() {
+  STATE = { user: null, cliente: null, page: 'dashboard', moduleOpen: null };
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+// ── SIDEBAR ──────────────────────────────────────────────
+function renderSidebar() {
+  const sb = document.getElementById('sidebar');
+  const isAdmin = ['superadmin','admin'].includes(STATE.user.rol);
+  let html = '';
+  if (isAdmin) {
+    html += `<div class="sidebar-title">Administración</div>
+    <div class="nav-item" onclick="renderPage('dashboard')"><span class="icon">📊</span>Dashboard</div>
+    <div class="nav-item" onclick="renderPage('clientes')"><span class="icon">👥</span>Clientes</div>
+    <div class="nav-item" onclick="renderPage('pagos')"><span class="icon">💳</span>Pagos</div>
+    <div class="nav-item" onclick="renderPage('admins')"><span class="icon">🔐</span>Admins</div>
+    <div class="nav-item" onclick="renderPage('backup')"><span class="icon">💾</span>Backup</div>`;
+  } else {
+    html += `<div class="sidebar-title">Menú</div>
+    <div class="nav-item" onclick="renderPage('dashboard')"><span class="icon">🏠</span>Inicio</div>
+    <div class="nav-item" onclick="renderPage('modulos')"><span class="icon">⚡</span>Mis Módulos</div>`;
+  }
+  sb.innerHTML = html;
+}
+
+function setActive(page) {
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  // find by onclick
+  document.querySelectorAll('.nav-item').forEach(el => {
+    if (el.getAttribute('onclick') && el.getAttribute('onclick').includes(`'${page}'`)) el.classList.add('active');
+  });
+}
+
+// ── PAGES ────────────────────────────────────────────────
+async function renderPage(page) {
+  STATE.page = page; STATE.moduleOpen = null;
+  setActive(page);
+  const c = document.getElementById('content');
+  c.innerHTML = '<div class="loading">Cargando...</div>';
+  try {
+    if (['superadmin','admin'].includes(STATE.user.rol)) {
+      if (page === 'dashboard') await renderAdminDashboard();
+      else if (page === 'clientes') await renderClientes();
+      else if (page === 'pagos') await renderPagos();
+      else if (page === 'admins') await renderAdmins();
+      else if (page === 'backup') await renderBackup();
+    } else {
+      if (page === 'dashboard') await renderClienteDashboard();
+      else if (page === 'modulos') await renderModulos();
+    }
+  } catch(e) { c.innerHTML = `<div class="empty">Error cargando página: ${e.message}</div>`; }
+}
+
+// ── ADMIN DASHBOARD ──────────────────────────────────────
+async function renderAdminDashboard() {
+  const [clientes, pagos, modulos] = await Promise.all([
+    api('clientes?select=*'),
+    api('pagos?pagado=eq.false&select=*'),
+    api('cliente_modulos?activo=eq.true&select=*')
+  ]);
+  // Check suspensions
+  let suspendidos = 0;
+  for (const cl of clientes) {
+    const p = await api(`pagos?cliente_id=eq.${cl.id}&pagado=eq.false&select=*`);
+    if (p.length >= 2) suspendidos++;
+  }
+  document.getElementById('content').innerHTML = `
+    <div class="page-title">Panel de Control</div>
+    <div class="page-sub">Resumen general de iall Club</div>
+    <div class="cards-grid">
+      <div class="kpi-card"><div class="kpi-label">Clientes</div><div class="kpi-value cyan">${clientes.length}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Módulos activos</div><div class="kpi-value purple">${modulos.length}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Pagos pendientes</div><div class="kpi-value yellow">${pagos.length}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Suspendidos</div><div class="kpi-value red">${suspendidos}</div></div>
+    </div>`;
+}
+
+// ── CLIENTES ─────────────────────────────────────────────
+async function renderClientes() {
+  const clientes = await api('clientes?select=*,usuarios(nombre,email,activo)');
+  let rows = '';
+  for (const cl of clientes) {
+    const pagos = await api(`pagos?cliente_id=eq.${cl.id}&pagado=eq.false&select=*`);
+    const susp = pagos.length >= 2;
+    const u = cl.usuarios || {};
+    rows += `<tr>
+      <td>${u.nombre||'-'}</td>
+      <td>${cl.empresa}</td>
+      <td>${u.email||'-'}</td>
+      <td><span class="badge ${susp?'red':'green'}">${susp?'Suspendido':'Activo'}</span></td>
+      <td>
+        <button class="action-btn edit" onclick="editCliente('${cl.id}')">Editar</button>
+        <button class="action-btn edit" onclick="verModulos('${cl.id}','${cl.empresa}')">Módulos</button>
+        <button class="action-btn del" onclick="delCliente('${cl.id}')">Eliminar</button>
+      </td>
+    </tr>`;
+  }
+  document.getElementById('content').innerHTML = `
+    <div class="page-title">Clientes</div>
+    <div class="page-sub">Gestión de clientes y módulos contratados</div>
+    <div style="margin-bottom:16px">
+      <button class="btn-primary" style="width:auto;padding:10px 20px" onclick="newCliente()">+ Nuevo cliente</button>
+    </div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Nombre</th><th>Empresa</th><th>Email</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody>${rows||'<tr><td colspan="5" style="text-align:center;color:var(--text2)">Sin clientes aún</td></tr>'}</tbody></table>
+    </div>`;
+}
+
+async function newCliente() {
+  const mods = await api('modulos?activo=eq.true&select=*');
+  showModal(`<h3>Nuevo Cliente</h3>
+    <div class="form-group"><label>Nombre completo</label><input id="f-nombre" placeholder="Juan Pérez"/></div>
+    <div class="form-group"><label>Email (será su usuario)</label><input id="f-email" type="email" placeholder="juan@empresa.com"/></div>
+    <div class="form-group"><label>Contraseña inicial</label><input id="f-pass" placeholder="Contraseña"/></div>
+    <div class="form-group"><label>Empresa</label><input id="f-empresa" placeholder="Empresa S.A."/></div>
+    <div class="form-group"><label>Teléfono</label><input id="f-tel" placeholder="+54 261..."/></div>
+    <div class="form-group"><label>Módulos contratados</label>
+      <div class="modulos-check">${mods.map(m=>`<label class="mod-check"><input type="checkbox" value="${m.id}" data-nombre="${m.nombre}"/> ${m.nombre}</label>`).join('')}</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveNewCliente()">Guardar</button>
+    </div>`);
+}
+
+async function saveNewCliente() {
+  const nombre = document.getElementById('f-nombre').value.trim();
+  const email  = document.getElementById('f-email').value.trim();
+  const pass   = document.getElementById('f-pass').value;
+  const empresa= document.getElementById('f-empresa').value.trim();
+  const tel    = document.getElementById('f-tel').value.trim();
+  if (!nombre||!email||!pass||!empresa) { toast('Completá todos los campos','error'); return; }
+  try {
+    // Create user
+    const [u] = await api('usuarios?select=*', 'POST', { email, nombre, rol:'cliente', activo:true, password_hash: pass });
+    // Create cliente
+    const [cl] = await api('clientes?select=*', 'POST', { usuario_id: u.id, empresa, contacto: nombre, telefono: tel });
+    // Assign modules
+    const checks = document.querySelectorAll('.modulos-check input:checked');
+    for (const ch of checks) {
+      await api('cliente_modulos', 'POST', { cliente_id: cl.id, modulo_id: ch.value, activo: true });
+    }
+    // Create pagos for current month
+    const now = new Date();
+    await api('pagos', 'POST', { cliente_id: cl.id, mes: now.getMonth()+1, anio: now.getFullYear(), pagado: false });
+    closeModal(); toast('Cliente creado exitosamente');
+    renderPage('clientes');
+  } catch(e) { toast('Error: ' + e.message,'error'); }
+}
+
+async function verModulos(clienteId, empresa) {
+  const [todos, contratados] = await Promise.all([
+    api('modulos?activo=eq.true&select=*'),
+    api(`cliente_modulos?cliente_id=eq.${clienteId}&select=*,modulos(nombre)`)
+  ]);
+  const contratadosIds = contratados.map(c=>c.modulo_id);
+  showModal(`<h3>Módulos — ${empresa}</h3>
+    <div class="modulos-check">${todos.map(m=>`<label class="mod-check">
+      <input type="checkbox" value="${m.id}" ${contratadosIds.includes(m.id)?'checked':''}/> ${m.nombre}
+    </label>`).join('')}</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveModulos('${clienteId}')">Guardar</button>
+    </div>`);
+}
+
+async function saveModulos(clienteId) {
+  try {
+    const checks = document.querySelectorAll('.modulos-check input');
+    for (const ch of checks) {
+      const exists = await api(`cliente_modulos?cliente_id=eq.${clienteId}&modulo_id=eq.${ch.value}&select=*`);
+      if (ch.checked && !exists.length) {
+        await api('cliente_modulos', 'POST', { cliente_id: clienteId, modulo_id: ch.value, activo: true });
+      } else if (!ch.checked && exists.length) {
+        await api(`cliente_modulos?id=eq.${exists[0].id}`, 'DELETE');
+      }
+    }
+    closeModal(); toast('Módulos actualizados');
+  } catch(e) { toast('Error: '+e.message,'error'); }
+}
+
+async function delCliente(id) {
+  if (!confirm('¿Eliminar este cliente? Se borrarán todos sus datos.')) return;
+  try {
+    const cl = await api(`clientes?id=eq.${id}&select=usuario_id`);
+    await api(`cliente_modulos?cliente_id=eq.${id}`, 'DELETE');
+    await api(`pagos?cliente_id=eq.${id}`, 'DELETE');
+    await api(`clientes?id=eq.${id}`, 'DELETE');
+    if (cl[0]) await api(`usuarios?id=eq.${cl[0].usuario_id}`, 'DELETE');
+    toast('Cliente eliminado'); renderPage('clientes');
+  } catch(e) { toast('Error: '+e.message,'error'); }
+}
+
+async function editCliente(id) {
+  const [cl] = await api(`clientes?id=eq.${id}&select=*,usuarios(nombre,email)`);
+  showModal(`<h3>Editar Cliente</h3>
+    <div class="form-group"><label>Empresa</label><input id="f-empresa" value="${cl.empresa}"/></div>
+    <div class="form-group"><label>Teléfono</label><input id="f-tel" value="${cl.telefono||''}"/></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="updateCliente('${id}')">Guardar</button>
+    </div>`);
+}
+
+async function updateCliente(id) {
+  try {
+    await api(`clientes?id=eq.${id}`, 'PATCH', {
+      empresa: document.getElementById('f-empresa').value,
+      telefono: document.getElementById('f-tel').value
+    });
+    closeModal(); toast('Cliente actualizado'); renderPage('clientes');
+  } catch(e) { toast('Error: '+e.message,'error'); }
+}
+
+// ── PAGOS ────────────────────────────────────────────────
+async function renderPagos() {
+  const clientes = await api('clientes?select=*,usuarios(nombre,email)');
+  let rows = '';
+  for (const cl of clientes) {
+    const pagos = await api(`pagos?cliente_id=eq.${cl.id}&order=anio.desc,mes.desc&select=*`);
+    const susp = pagos.filter(p=>!p.pagado).length >= 2;
+    for (const p of pagos.slice(0,3)) {
+      rows += `<tr>
+        <td>${cl.usuarios?.nombre||'-'}</td>
+        <td>${cl.empresa}</td>
+        <td>${p.mes}/${p.anio}</td>
+        <td><span class="badge ${p.pagado?'green':'red'}">${p.pagado?'Pagado':'Pendiente'}</span></td>
+        <td>${susp?'<span class="badge red">Suspendido</span>':''}</td>
+        <td>${!p.pagado?`<button class="action-btn pay" onclick="marcarPagado('${p.id}')">Marcar pagado</button>`:''}</td>
+      </tr>`;
+    }
+  }
+  document.getElementById('content').innerHTML = `
+    <div class="page-title">Pagos</div>
+    <div class="page-sub">Control de pagos mensuales — suspensión automática a los 2 meses de deuda</div>
+    <div style="margin-bottom:16px">
+      <button class="btn-primary" style="width:auto;padding:10px 20px" onclick="newPago()">+ Registrar pago</button>
+    </div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Cliente</th><th>Empresa</th><th>Período</th><th>Estado</th><th>Suspensión</th><th>Acción</th></tr></thead>
+      <tbody>${rows||'<tr><td colspan="6" style="text-align:center;color:var(--text2)">Sin registros</td></tr>'}</tbody></table>
+    </div>`;
+}
+
+async function marcarPagado(pagoId) {
+  try {
+    await api(`pagos?id=eq.${pagoId}`, 'PATCH', { pagado: true, fecha_pago: new Date().toISOString() });
+    toast('Pago registrado ✓'); renderPage('pagos');
+  } catch(e) { toast('Error: '+e.message,'error'); }
+}
+
+async function newPago() {
+  const clientes = await api('clientes?select=*,usuarios(nombre)');
+  const now = new Date();
+  showModal(`<h3>Nuevo Registro de Pago</h3>
+    <div class="form-group"><label>Cliente</label>
+      <select id="f-cid">${clientes.map(c=>`<option value="${c.id}">${c.usuarios?.nombre} — ${c.empresa}</option>`).join('')}</select>
+    </div>
+    <div class="form-group"><label>Mes</label>
+      <select id="f-mes">${[...Array(12)].map((_,i)=>`<option value="${i+1}" ${i+1===now.getMonth()+1?'selected':''}>${i+1}</option>`).join('')}</select>
+    </div>
+    <div class="form-group"><label>Año</label><input id="f-anio" type="number" value="${now.getFullYear()}"/></div>
+    <div class="form-group"><label>Monto (opcional)</label><input id="f-monto" type="number" placeholder="0.00"/></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="savePago()">Guardar</button>
+    </div>`);
+}
+
+async function savePago() {
+  try {
+    await api('pagos', 'POST', {
+      cliente_id: document.getElementById('f-cid').value,
+      mes: parseInt(document.getElementById('f-mes').value),
+      anio: parseInt(document.getElementById('f-anio').value),
+      monto: parseFloat(document.getElementById('f-monto').value)||null,
+      pagado: false
+    });
+    closeModal(); toast('Pago registrado'); renderPage('pagos');
+  } catch(e) { toast('Error: '+e.message,'error'); }
+}
+
+// ── ADMINS ───────────────────────────────────────────────
+async function renderAdmins() {
+  const admins = await api("usuarios?rol=in.(superadmin,admin)&select=*");
+  let rows = admins.map(u=>`<tr>
+    <td>${u.nombre}</td><td>${u.email}</td>
+    <td><span class="badge ${u.rol==='superadmin'?'purple':'cyan'}">${u.rol}</span></td>
+    <td><span class="badge ${u.activo?'green':'red'}">${u.activo?'Activo':'Inactivo'}</span></td>
+    <td>${STATE.user.rol==='superadmin'&&u.id!==STATE.user.id?`<button class="action-btn del" onclick="delAdmin('${u.id}')">Eliminar</button>`:''}</td>
+  </tr>`).join('');
+  document.getElementById('content').innerHTML = `
+    <div class="page-title">Administradores</div>
+    <div class="page-sub">Gestión de cuentas admin</div>
+    <div style="margin-bottom:16px">
+      <button class="btn-primary" style="width:auto;padding:10px 20px" onclick="newAdmin()">+ Nuevo admin</button>
+    </div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Estado</th><th>Acción</th></tr></thead>
+      <tbody>${rows}</tbody></table>
+    </div>`;
+}
+
+async function newAdmin() {
+  showModal(`<h3>Nuevo Administrador</h3>
+    <div class="form-group"><label>Nombre</label><input id="f-nombre" /></div>
+    <div class="form-group"><label>Email</label><input id="f-email" type="email"/></div>
+    <div class="form-group"><label>Contraseña</label><input id="f-pass" type="password"/></div>
+    <div class="form-group"><label>Rol</label>
+      <select id="f-rol"><option value="admin">Admin</option><option value="superadmin">Superadmin</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveAdmin()">Guardar</button>
+    </div>`);
+}
+
+async function saveAdmin() {
+  try {
+    await api('usuarios', 'POST', {
+      nombre: document.getElementById('f-nombre').value,
+      email: document.getElementById('f-email').value,
+      password_hash: document.getElementById('f-pass').value,
+      rol: document.getElementById('f-rol').value,
+      activo: true
+    });
+    closeModal(); toast('Admin creado'); renderPage('admins');
+  } catch(e) { toast('Error: '+e.message,'error'); }
+}
+
+async function delAdmin(id) {
+  if (!confirm('¿Eliminar este administrador?')) return;
+  try { await api(`usuarios?id=eq.${id}`, 'DELETE'); toast('Admin eliminado'); renderPage('admins'); }
+  catch(e) { toast('Error: '+e.message,'error'); }
+}
+
+// ── BACKUP ───────────────────────────────────────────────
+async function renderBackup() {
+  document.getElementById('content').innerHTML = `
+    <div class="page-title">Backup</div>
+    <div class="page-sub">Exportá todos los datos como respaldo JSON</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
+      <button class="backup-btn" onclick="doBackup('todo')">💾 Backup completo</button>
+      <button class="backup-btn" onclick="doBackup('clientes')">👥 Solo clientes</button>
+      <button class="backup-btn" onclick="doBackup('pagos')">💳 Solo pagos</button>
+      <button class="backup-btn" onclick="doBackup('progreso')">📊 Solo progreso</button>
+    </div>`;
+}
+
+async function doBackup(tipo) {
+  try {
+    let data = {};
+    if (tipo === 'todo' || tipo === 'clientes') data.clientes = await api('clientes?select=*,usuarios(*)');
+    if (tipo === 'todo' || tipo === 'pagos')    data.pagos    = await api('pagos?select=*');
+    if (tipo === 'todo' || tipo === 'progreso') data.progreso = await api('progreso_modulo?select=*');
+    if (tipo === 'todo') { data.usuarios = await api('usuarios?select=id,email,nombre,rol,activo,created_at'); data.modulos = await api('modulos?select=*'); }
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `iallclub_backup_${tipo}_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    toast('Backup descargado ✓');
+  } catch(e) { toast('Error: '+e.message,'error'); }
+}
+
+// ── CLIENTE DASHBOARD ────────────────────────────────────
+async function renderClienteDashboard() {
+  const c = document.getElementById('content');
+  if (STATE.suspended) {
+    c.innerHTML = `
+      <div class="suspended-banner">
+        <span style="font-size:28px">⚠️</span>
+        <div><strong style="color:var(--red)">Servicio suspendido</strong><br>
+        <span style="font-size:13px;color:var(--text2)">Tu cuenta tiene 2 o más meses de deuda. Contactá a iall Club para regularizar tu situación.</span></div>
+      </div>`;
+    return;
+  }
+  const mods = await api(`cliente_modulos?cliente_id=eq.${STATE.cliente.id}&activo=eq.true&select=*,modulos(nombre,descripcion)`);
+  c.innerHTML = `
+    <div class="page-title">Bienvenido, ${STATE.user.nombre}</div>
+    <div class="page-sub">${STATE.cliente.empresa} · ${mods.length} módulo${mods.length!==1?'s':''} activo${mods.length!==1?'s':''}</div>
+    <div class="cards-grid">
+      <div class="kpi-card"><div class="kpi-label">Módulos activos</div><div class="kpi-value cyan">${mods.length}</div></div>
+    </div>
+    <p style="color:var(--text2);font-size:13px;margin-bottom:16px">Accedé a tus módulos desde el menú lateral.</p>`;
+}
+
+// ── MÓDULOS CLIENTE ──────────────────────────────────────
+const MODULE_ICONS = { mantenimiento:'🔧', produccion:'🏭', comercial:'📈', camara:'📷', stock:'📦', calidad:'✅' };
+const MODULE_COLOR = { mantenimiento:'cyan', produccion:'purple', comercial:'green', camara:'yellow', stock:'cyan', calidad:'green' };
+
+async function renderModulos() {
+  if (STATE.suspended) { renderClienteDashboard(); return; }
+  const contratados = await api(`cliente_modulos?cliente_id=eq.${STATE.cliente.id}&activo=eq.true&select=*,modulos(nombre,descripcion)`);
+  const todos = await api('modulos?activo=eq.true&select=*');
+  const contratadosIds = contratados.map(c=>c.modulo_id);
+
+  const cards = todos.map(m => {
+    const locked = !contratadosIds.includes(m.id);
+    return `<div class="module-card ${locked?'locked':''}" onclick="${locked?'':'openModule(\''+m.nombre+'\')'}">
+      <div class="module-icon">${MODULE_ICONS[m.nombre]||'⚡'}</div>
+      <div class="module-name">${m.nombre.charAt(0).toUpperCase()+m.nombre.slice(1)} App</div>
+      <div class="module-desc">${locked?'🔒 No contratado':m.descripcion||'Acceder al módulo'}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('content').innerHTML = `
+    <div class="page-title">Mis Módulos</div>
+    <div class="page-sub">Hacé clic en un módulo para abrirlo</div>
+    <div class="modules-grid">${cards}</div>`;
+}
+
+function openModule(nombre) {
+  STATE.moduleOpen = nombre;
+  const c = document.getElementById('content');
+  const icon = MODULE_ICONS[nombre]||'⚡';
+  // Each module renders its own mini-app
+  const moduleContent = getModuleHTML(nombre);
+  c.innerHTML = `
+    <div class="module-back" onclick="renderPage('modulos')">← Volver a módulos</div>
+    <div class="page-title">${icon} ${nombre.charAt(0).toUpperCase()+nombre.slice(1)} App</div>
+    <div class="page-sub">Módulo activo</div>
+    <div style="margin-top:16px">${moduleContent}</div>`;
+}
+
+function getModuleHTML(nombre) {
+  const modules = {
+    stock: `<div class="table-wrap" style="padding:24px">
+      <h3 style="margin-bottom:16px">📦 Stock App</h3>
+      <p style="color:var(--text2);font-size:13px;margin-bottom:20px">Gestión de inventario y stock de productos.</p>
+      <div class="cards-grid">
+        <div class="kpi-card"><div class="kpi-label">Productos</div><div class="kpi-value cyan">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Stock bajo</div><div class="kpi-value yellow">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Movimientos hoy</div><div class="kpi-value green">—</div></div>
+      </div>
+      <p style="color:var(--text2);font-size:13px;margin-top:16px">📌 Conectá tu Google Sheet de stock para ver datos en tiempo real.</p>
+    </div>`,
+    calidad: `<div class="table-wrap" style="padding:24px">
+      <h3 style="margin-bottom:16px">✅ Calidad App</h3>
+      <p style="color:var(--text2);font-size:13px;margin-bottom:20px">Control de calidad, auditorías y no conformidades.</p>
+      <div class="cards-grid">
+        <div class="kpi-card"><div class="kpi-label">Auditorías</div><div class="kpi-value cyan">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">No conformidades</div><div class="kpi-value red">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Aprobados</div><div class="kpi-value green">—</div></div>
+      </div>
+    </div>`,
+    mantenimiento: `<div class="table-wrap" style="padding:24px">
+      <h3 style="margin-bottom:16px">🔧 Mantenimiento App</h3>
+      <p style="color:var(--text2);font-size:13px;margin-bottom:20px">Gestión de mantenimiento preventivo y correctivo.</p>
+      <div class="cards-grid">
+        <div class="kpi-card"><div class="kpi-label">Órdenes abiertas</div><div class="kpi-value cyan">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Vencidos</div><div class="kpi-value red">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Completados</div><div class="kpi-value green">—</div></div>
+      </div>
+    </div>`,
+    produccion: `<div class="table-wrap" style="padding:24px">
+      <h3 style="margin-bottom:16px">🏭 Producción App</h3>
+      <p style="color:var(--text2);font-size:13px;margin-bottom:20px">Trazabilidad y control de producción.</p>
+      <div class="cards-grid">
+        <div class="kpi-card"><div class="kpi-label">Lotes activos</div><div class="kpi-value cyan">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Producción hoy</div><div class="kpi-value purple">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Rechazados</div><div class="kpi-value red">—</div></div>
+      </div>
+    </div>`,
+    comercial: `<div class="table-wrap" style="padding:24px">
+      <h3 style="margin-bottom:16px">📈 Comercial App</h3>
+      <p style="color:var(--text2);font-size:13px;margin-bottom:20px">Gestión comercial, ventas y clientes.</p>
+      <div class="cards-grid">
+        <div class="kpi-card"><div class="kpi-label">Ventas mes</div><div class="kpi-value cyan">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Clientes activos</div><div class="kpi-value green">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Pedidos</div><div class="kpi-value purple">—</div></div>
+      </div>
+    </div>`,
+    camara: `<div class="table-wrap" style="padding:24px">
+      <h3 style="margin-bottom:16px">📷 Cámara App</h3>
+      <p style="color:var(--text2);font-size:13px;margin-bottom:20px">Control de cámaras frigoríficas y temperaturas.</p>
+      <div class="cards-grid">
+        <div class="kpi-card"><div class="kpi-label">Cámaras</div><div class="kpi-value cyan">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Alertas temp.</div><div class="kpi-value red">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">OK</div><div class="kpi-value green">—</div></div>
+      </div>
+    </div>`
+  };
+  return modules[nombre] || `<div class="table-wrap" style="padding:24px"><p style="color:var(--text2)">Módulo en construcción...</p></div>`;
+}
+
+// ── MODAL ────────────────────────────────────────────────
+function showModal(html) {
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+});
+</script>
+</body>
+</html>
