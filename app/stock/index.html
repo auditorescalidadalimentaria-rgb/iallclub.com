@@ -898,9 +898,38 @@ const API_KEY = 'deposito2026fv';
 // Intervalo de auto-refresh (ms) — 3 minutos
 const REFRESH_INTERVAL = 3 * 60 * 1000;
 
+// ─── CLIENTE ID — datos aislados por cliente ───
+const _urlParams = new URLSearchParams(window.location.search);
+const CLIENT_ID = _urlParams.get('cid') || 'default';
+const STOCK_KEY = 'dep_stock_' + CLIENT_ID;
+const HIST_KEY  = 'dep_hist_'  + CLIENT_ID;
+
+// ─── MIGRACIÓN AUTOMÁTICA ───
+// Si existen datos en el formato viejo (dep_stock / dep_hist),
+// los migramos a la nueva clave del cliente y borramos las viejas.
+(function migrarDatos() {
+  const viejoStock = localStorage.getItem('dep_stock');
+  const viejoHist  = localStorage.getItem('dep_hist');
+  const yaHayNuevo = localStorage.getItem(STOCK_KEY);
+
+  // Solo migrar si hay datos viejos Y todavía no existe la clave nueva
+  if (viejoStock && !yaHayNuevo) {
+    localStorage.setItem(STOCK_KEY, viejoStock);
+    console.log('[iall Club] Stock migrado a clave: ' + STOCK_KEY);
+  }
+  if (viejoHist && !localStorage.getItem(HIST_KEY)) {
+    localStorage.setItem(HIST_KEY, viejoHist);
+    console.log('[iall Club] Historial migrado a clave: ' + HIST_KEY);
+  }
+
+  // Limpiar claves viejas solo si ya se migraron exitosamente
+  if (localStorage.getItem(STOCK_KEY)) localStorage.removeItem('dep_stock');
+  if (localStorage.getItem(HIST_KEY))  localStorage.removeItem('dep_hist');
+})();
+
 // ─── DATA ───
-let stock = JSON.parse(localStorage.getItem('dep_stock') || '{}');
-let historial = JSON.parse(localStorage.getItem('dep_hist') || '[]');
+let stock = JSON.parse(localStorage.getItem(STOCK_KEY) || '{}');
+let historial = JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
 
 let filtroTipo = 'all';
 let sortKey = 'producto';
@@ -908,8 +937,8 @@ let sortAsc = true;
 let cloudConnected = false;
 
 function saveLocal() {
-  localStorage.setItem('dep_stock', JSON.stringify(stock));
-  localStorage.setItem('dep_hist', JSON.stringify(historial));
+  localStorage.setItem(STOCK_KEY, JSON.stringify(stock));
+  localStorage.setItem(HIST_KEY, JSON.stringify(historial));
 }
 
 // ── Sync status UI ──
