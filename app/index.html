@@ -469,6 +469,7 @@ async function renderClientes() {
       <td>
         <button class="action-btn edit" onclick="editCliente('${cl.id}')">Editar</button>
         <button class="action-btn edit" onclick="verModulos('${cl.id}','${cl.empresa}')">Módulos</button>
+        <button class="action-btn pay" onclick="verStock('${cl.id}','${cl.empresa}')">📦 Stock</button>
         <button class="action-btn del" onclick="delCliente('${cl.id}')">Eliminar</button>
       </td>
     </tr>`;
@@ -861,10 +862,11 @@ function openModule(nombre) {
 
   // Stock App: carga en iframe aislado
   if (nombre === 'stock') {
+    const clienteId = STATE.cliente ? STATE.cliente.id : 'admin';
     c.innerHTML = `
       <div class="module-back" onclick="renderPage('modulos')" style="margin-bottom:12px">← Volver a módulos</div>
       <iframe
-        src="/app/stock/"
+        src="/app/stock/?cid=${clienteId}"
         style="width:100%;height:calc(100vh - 120px);border:none;border-radius:8px;display:block"
         allowfullscreen>
       </iframe>`;
@@ -944,6 +946,79 @@ function closeModal() {
 document.getElementById('modal-overlay').addEventListener('click', e => {
   if (e.target === document.getElementById('modal-overlay')) closeModal();
 });
+
+// ── VER STOCK DE UN CLIENTE (vista admin) ──
+async function verStock(clienteId, empresa) {
+  const content = document.getElementById('content');
+  content.innerHTML = '<div class="loading">⏳ Cargando stock...</div>';
+
+  try {
+    const [items, historial] = await Promise.all([
+      api(`stock_items?cliente_id=eq.${clienteId}&order=producto.asc&select=*`),
+      api(`stock_historial?cliente_id=eq.${clienteId}&order=created_at.desc&limit=50&select=*`)
+    ]);
+
+    // KPIs
+    const totalItems = items.length;
+    const totalUnidades = items.reduce((s, i) => s + i.cantidad, 0);
+    const stockBajo = items.filter(i => i.cantidad <= 5 && i.cantidad > 0).length;
+    const sinStock = items.filter(i => i.cantidad === 0).length;
+
+    // Tabla de stock
+    const rows = items.map(i => {
+      const dot = i.cantidad === 0 ? 'red' : i.cantidad <= 5 ? 'yellow' : 'green';
+      return `<tr>
+        <td><span class="badge cyan">${i.codigo}</span></td>
+        <td>${i.producto}</td>
+        <td><span class="badge purple">${i.rack}</span></td>
+        <td><strong style="color:var(--${dot})">${i.cantidad}</strong></td>
+        <td style="font-size:11px;color:var(--text2)">${i.ultimo_mov||'-'}</td>
+      </tr>`;
+    }).join('');
+
+    // Historial reciente
+    const histRows = historial.slice(0,10).map(h => `
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div style="font-size:11px;color:var(--text2);min-width:130px">${h.fecha}</div>
+        <div style="flex:1;font-size:13px">
+          <span class="badge ${h.tipo==='ingreso'?'green':'red'}">${h.tipo}</span>
+          &nbsp;<strong>${h.cantidad}×</strong> ${h.producto}
+          <span class="badge purple" style="margin-left:6px">${h.rack}</span>
+          <br><span style="font-size:11px;color:var(--text2)">${h.codigo} · Resp: ${h.responsable||'-'}${h.obs?' · '+h.obs:''}</span>
+        </div>
+      </div>`).join('');
+
+    content.innerHTML = `
+      <div class="module-back" onclick="renderPage('clientes')">← Volver a clientes</div>
+      <div class="page-title">📦 Stock — ${empresa}</div>
+      <div class="page-sub">Inventario en tiempo real desde Supabase</div>
+
+      <div class="cards-grid" style="margin-bottom:24px">
+        <div class="kpi-card"><div class="kpi-label">Productos</div><div class="kpi-value cyan">${totalItems}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Unidades totales</div><div class="kpi-value purple">${totalUnidades}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Stock bajo</div><div class="kpi-value yellow">${stockBajo}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Sin stock</div><div class="kpi-value red">${sinStock}</div></div>
+      </div>
+
+      <div class="table-wrap" style="margin-bottom:24px">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);font-weight:600;font-size:15px">Stock actual</div>
+        <table>
+          <thead><tr><th>Código</th><th>Producto</th><th>Rack</th><th>Cantidad</th><th>Último mov.</th></tr></thead>
+          <tbody>${rows || '<tr><td colspan="5" class="empty">Sin productos cargados</td></tr>'}</tbody>
+        </table>
+      </div>
+
+      <div class="table-wrap">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);font-weight:600;font-size:15px">Últimos 10 movimientos</div>
+        <div style="padding:8px 16px">
+          ${histRows || '<div class="empty">Sin movimientos registrados</div>'}
+        </div>
+      </div>`;
+
+  } catch(e) {
+    content.innerHTML = `<div class="empty">❌ Error cargando stock: ${e.message}</div>`;
+  }
+}
 
 </script>
 </body>
