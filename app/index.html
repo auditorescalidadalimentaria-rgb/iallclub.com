@@ -942,6 +942,31 @@ function openModule(nombre) {
     return;
   }
 
+  // Calidad App: dashboard específico por cliente
+  if (nombre === 'calidad') {
+    const clienteId = STATE.cliente ? STATE.cliente.id : '';
+    const CUYOCREM_ID = 'f7d65e86-e904-48be-bd6b-b7a43004a5e9';
+
+    if (clienteId === CUYOCREM_ID) {
+      // Cuyocrem/Lomoro — mostrar dashboard de producción
+      c.innerHTML = `
+        <div class="module-back" onclick="renderPage('modulos')" style="margin-bottom:12px">← Volver a módulos</div>
+        <iframe
+          src="https://iallclub.github.io/heladoslomoro/"
+          style="width:100%;height:calc(100vh - 120px);border:none;border-radius:8px;display:block"
+          allowfullscreen>
+        </iframe>`;
+    } else {
+      // Otros clientes — vista genérica
+      c.innerHTML = `
+        <div class="module-back" onclick="renderPage('modulos')" style="margin-bottom:12px">← Volver a módulos</div>
+        <div class="page-title">✅ Calidad App</div>
+        <div class="page-sub">Módulo activo</div>
+        <div style="margin-top:16px">${getModuleHTML('calidad')}</div>`;
+    }
+    return;
+  }
+
   c.innerHTML = `
     <div class="module-back" onclick="renderPage('modulos')">← Volver a módulos</div>
     <div class="page-title">${icon} ${nombre.charAt(0).toUpperCase()+nombre.slice(1)} App</div>
