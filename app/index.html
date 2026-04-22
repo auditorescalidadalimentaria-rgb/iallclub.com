@@ -499,6 +499,82 @@
 .temp-ai-response { font-size:13px; line-height:1.7; white-space:pre-wrap; margin-top:12px; }
 .temp-ai-loading { display:flex; align-items:center; gap:8px; color:var(--text2); font-size:13px; }
 
+
+/* ── PRODUCCIÓN MODULE ── */
+.prod-wrap { padding: 0; }
+.prod-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+.prod-title { font-size:20px; font-weight:700; font-family:'Syne',sans-serif; }
+.prod-actions { display:flex; gap:10px; flex-wrap:wrap; }
+.prod-btn {
+  padding:8px 16px; border-radius:8px; border:none; cursor:pointer;
+  font-size:13px; font-weight:600; transition:.2s; font-family:'DM Sans',sans-serif;
+}
+.prod-btn.primary { background:linear-gradient(135deg,#00f5c4,#0099ff); color:#000; }
+.prod-btn.secondary { background:rgba(0,212,255,.1); color:#00d4ff; border:1px solid rgba(0,212,255,.3); }
+.prod-btn.purple { background:rgba(139,92,246,.1); color:#8b5cf6; border:1px solid rgba(139,92,246,.3); }
+.prod-btn.danger { background:rgba(239,68,68,.1); color:#ef4444; border:1px solid rgba(239,68,68,.3); }
+.prod-btn.ai { background:linear-gradient(135deg,#8b5cf6,#00d4ff); color:#fff; }
+.prod-btn:hover { opacity:.8; transform:translateY(-1px); }
+
+/* KPIs */
+.prod-kpis { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; margin-bottom:24px; }
+.prod-kpi { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px; text-align:center; }
+.prod-kpi-label { font-size:10px; color:var(--text2); text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
+.prod-kpi-val { font-size:26px; font-weight:800; }
+.prod-kpi-val.cyan { color:#00d4ff; }
+.prod-kpi-val.green { color:#10b981; }
+.prod-kpi-val.yellow { color:#f59e0b; }
+.prod-kpi-val.red { color:#ef4444; }
+.prod-kpi-val.purple { color:#8b5cf6; }
+
+/* Tabs */
+.prod-tabs { display:flex; gap:4px; background:var(--bg2); padding:4px; border-radius:10px; margin-bottom:20px; width:fit-content; }
+.prod-tab { padding:8px 16px; border-radius:8px; cursor:pointer; font-size:13px; color:var(--text2); transition:.2s; border:none; background:transparent; font-family:'DM Sans',sans-serif; }
+.prod-tab.active { background:var(--card); color:#00d4ff; }
+
+/* Tabla registros */
+.prod-table-wrap { background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+.prod-toolbar { padding:12px 16px; border-bottom:1px solid var(--border); display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.prod-search { flex:1; max-width:250px; padding:8px 12px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:13px; outline:none; }
+.prod-search:focus { border-color:#00d4ff; }
+
+/* Eficiencia badge */
+.ef-alta { background:rgba(16,185,129,.15); color:#10b981; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; }
+.ef-media { background:rgba(245,158,11,.15); color:#f59e0b; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; }
+.ef-baja { background:rgba(239,68,68,.15); color:#ef4444; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; }
+
+/* Tarjetas de línea */
+.prod-lineas-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; margin-bottom:24px; }
+.prod-linea-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; transition:.2s; }
+.prod-linea-card:hover { border-color:#8b5cf6; transform:translateY(-2px); }
+
+/* Modal */
+.prod-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:2000; align-items:center; justify-content:center; }
+.prod-modal.open { display:flex; }
+.prod-modal-box { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:28px; width:640px; max-width:95vw; max-height:90vh; overflow-y:auto; }
+.prod-modal-title { font-size:16px; font-weight:700; margin-bottom:20px; font-family:'Syne',sans-serif; display:flex; align-items:center; justify-content:space-between; }
+.prod-close { cursor:pointer; color:var(--text2); font-size:20px; background:none; border:none; }
+.prod-close:hover { color:#ef4444; }
+.prod-field { margin-bottom:14px; }
+.prod-field label { font-size:11px; color:var(--text2); text-transform:uppercase; letter-spacing:.5px; display:block; margin-bottom:4px; }
+.prod-input { width:100%; padding:10px 14px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:13px; outline:none; transition:.2s; font-family:'DM Sans',sans-serif; }
+.prod-input:focus { border-color:#8b5cf6; }
+.prod-textarea { min-height:70px; resize:vertical; }
+.prod-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.prod-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+.prod-modal-actions { display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; }
+.prod-section { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text2); margin:20px 0 12px; padding-top:16px; border-top:1px solid var(--border); }
+
+/* Paradas */
+.prod-parada-item { background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:12px; margin-bottom:8px; display:flex; align-items:center; gap:10px; }
+.prod-parada-desc { flex:1; font-size:13px; }
+.prod-parada-tiempo { font-size:12px; color:#f59e0b; font-family:monospace; }
+.prod-parada-tipo { font-size:10px; color:var(--text2); text-transform:uppercase; }
+
+/* Eficiencia visual */
+.prod-ef-bar { height:6px; background:var(--border); border-radius:3px; margin-top:6px; overflow:hidden; }
+.prod-ef-fill { height:100%; border-radius:3px; transition:.3s; }
+
 </style>
 </head>
 <body>
@@ -1205,6 +1281,12 @@ function openModule(nombre) {
   // Cámara App — control de temperaturas
   if (nombre === 'camara') {
     openCamara();
+    return;
+  }
+
+  // Producción App
+  if (nombre === 'produccion') {
+    openProduccion();
     return;
   }
 
@@ -2045,6 +2127,82 @@ async function mantGenerarPDF(ordenId) {
 .temp-ai-response { font-size:13px; line-height:1.7; white-space:pre-wrap; margin-top:12px; }
 .temp-ai-loading { display:flex; align-items:center; gap:8px; color:var(--text2); font-size:13px; }
 
+
+/* ── PRODUCCIÓN MODULE ── */
+.prod-wrap { padding: 0; }
+.prod-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+.prod-title { font-size:20px; font-weight:700; font-family:'Syne',sans-serif; }
+.prod-actions { display:flex; gap:10px; flex-wrap:wrap; }
+.prod-btn {
+  padding:8px 16px; border-radius:8px; border:none; cursor:pointer;
+  font-size:13px; font-weight:600; transition:.2s; font-family:'DM Sans',sans-serif;
+}
+.prod-btn.primary { background:linear-gradient(135deg,#00f5c4,#0099ff); color:#000; }
+.prod-btn.secondary { background:rgba(0,212,255,.1); color:#00d4ff; border:1px solid rgba(0,212,255,.3); }
+.prod-btn.purple { background:rgba(139,92,246,.1); color:#8b5cf6; border:1px solid rgba(139,92,246,.3); }
+.prod-btn.danger { background:rgba(239,68,68,.1); color:#ef4444; border:1px solid rgba(239,68,68,.3); }
+.prod-btn.ai { background:linear-gradient(135deg,#8b5cf6,#00d4ff); color:#fff; }
+.prod-btn:hover { opacity:.8; transform:translateY(-1px); }
+
+/* KPIs */
+.prod-kpis { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; margin-bottom:24px; }
+.prod-kpi { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px; text-align:center; }
+.prod-kpi-label { font-size:10px; color:var(--text2); text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
+.prod-kpi-val { font-size:26px; font-weight:800; }
+.prod-kpi-val.cyan { color:#00d4ff; }
+.prod-kpi-val.green { color:#10b981; }
+.prod-kpi-val.yellow { color:#f59e0b; }
+.prod-kpi-val.red { color:#ef4444; }
+.prod-kpi-val.purple { color:#8b5cf6; }
+
+/* Tabs */
+.prod-tabs { display:flex; gap:4px; background:var(--bg2); padding:4px; border-radius:10px; margin-bottom:20px; width:fit-content; }
+.prod-tab { padding:8px 16px; border-radius:8px; cursor:pointer; font-size:13px; color:var(--text2); transition:.2s; border:none; background:transparent; font-family:'DM Sans',sans-serif; }
+.prod-tab.active { background:var(--card); color:#00d4ff; }
+
+/* Tabla registros */
+.prod-table-wrap { background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+.prod-toolbar { padding:12px 16px; border-bottom:1px solid var(--border); display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.prod-search { flex:1; max-width:250px; padding:8px 12px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:13px; outline:none; }
+.prod-search:focus { border-color:#00d4ff; }
+
+/* Eficiencia badge */
+.ef-alta { background:rgba(16,185,129,.15); color:#10b981; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; }
+.ef-media { background:rgba(245,158,11,.15); color:#f59e0b; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; }
+.ef-baja { background:rgba(239,68,68,.15); color:#ef4444; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; }
+
+/* Tarjetas de línea */
+.prod-lineas-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; margin-bottom:24px; }
+.prod-linea-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; transition:.2s; }
+.prod-linea-card:hover { border-color:#8b5cf6; transform:translateY(-2px); }
+
+/* Modal */
+.prod-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:2000; align-items:center; justify-content:center; }
+.prod-modal.open { display:flex; }
+.prod-modal-box { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:28px; width:640px; max-width:95vw; max-height:90vh; overflow-y:auto; }
+.prod-modal-title { font-size:16px; font-weight:700; margin-bottom:20px; font-family:'Syne',sans-serif; display:flex; align-items:center; justify-content:space-between; }
+.prod-close { cursor:pointer; color:var(--text2); font-size:20px; background:none; border:none; }
+.prod-close:hover { color:#ef4444; }
+.prod-field { margin-bottom:14px; }
+.prod-field label { font-size:11px; color:var(--text2); text-transform:uppercase; letter-spacing:.5px; display:block; margin-bottom:4px; }
+.prod-input { width:100%; padding:10px 14px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:13px; outline:none; transition:.2s; font-family:'DM Sans',sans-serif; }
+.prod-input:focus { border-color:#8b5cf6; }
+.prod-textarea { min-height:70px; resize:vertical; }
+.prod-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.prod-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+.prod-modal-actions { display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; }
+.prod-section { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text2); margin:20px 0 12px; padding-top:16px; border-top:1px solid var(--border); }
+
+/* Paradas */
+.prod-parada-item { background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:12px; margin-bottom:8px; display:flex; align-items:center; gap:10px; }
+.prod-parada-desc { flex:1; font-size:13px; }
+.prod-parada-tiempo { font-size:12px; color:#f59e0b; font-family:monospace; }
+.prod-parada-tipo { font-size:10px; color:var(--text2); text-transform:uppercase; }
+
+/* Eficiencia visual */
+.prod-ef-bar { height:6px; background:var(--border); border-radius:3px; margin-top:6px; overflow:hidden; }
+.prod-ef-fill { height:100%; border-radius:3px; transition:.3s; }
+
 </style></head><body>
   <div class="header">
     <div class="logo">iall<span>Club</span> &nbsp;·&nbsp; <span style="font-size:14px;font-weight:400">Mantenimiento</span></div>
@@ -2801,6 +2959,719 @@ async function delOperario(id, clienteId, empresa) {
     toast('Operario eliminado');
     verOperarios(clienteId, empresa);
   } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+// ══════════════════════════════════════════════════════
+// MÓDULO PRODUCCIÓN
+// ══════════════════════════════════════════════════════
+
+let prodTab = 'registros';
+let prodLineas = [];
+let prodRegistros = [];
+let prodParadasTemp = []; // paradas del registro en edición
+
+async function openProduccion() {
+  const clienteId = STATE.cliente ? STATE.cliente.id : null;
+  if (!clienteId) return;
+
+  document.getElementById('content').innerHTML = `
+    <div class="module-back" onclick="renderPage('modulos')" style="margin-bottom:12px">← Volver a módulos</div>
+    <div class="prod-wrap">
+      <div class="prod-header">
+        <div class="prod-title">🏭 Producción App</div>
+        <div class="prod-actions">
+          <button class="prod-btn primary" onclick="prodNuevoRegistro()">+ Nuevo registro</button>
+          <button class="prod-btn purple" onclick="prodSetTab('lineas')">⚙️ Líneas</button>
+          <button class="prod-btn secondary" onclick="prodExportar()">⬇ Exportar</button>
+          <button class="prod-btn ai" onclick="prodAnalisisIA()">🤖 Análisis IA</button>
+        </div>
+      </div>
+
+      <div class="prod-kpis">
+        <div class="prod-kpi"><div class="prod-kpi-label">Registros hoy</div><div class="prod-kpi-val cyan" id="pkpi-hoy">—</div></div>
+        <div class="prod-kpi"><div class="prod-kpi-label">Eficiencia promedio</div><div class="prod-kpi-val green" id="pkpi-ef">—</div></div>
+        <div class="prod-kpi"><div class="prod-kpi-label">Total producido</div><div class="prod-kpi-val purple" id="pkpi-prod">—</div></div>
+        <div class="prod-kpi"><div class="prod-kpi-label">Paradas hoy</div><div class="prod-kpi-val yellow" id="pkpi-paradas">—</div></div>
+        <div class="prod-kpi"><div class="prod-kpi-label">Descarte total</div><div class="prod-kpi-val red" id="pkpi-descarte">—</div></div>
+      </div>
+
+      <div class="prod-tabs">
+        <button class="prod-tab active" id="ptab-registros" onclick="prodSetTab('registros')">📋 Registros</button>
+        <button class="prod-tab" id="ptab-lineas" onclick="prodSetTab('lineas')">⚙️ Líneas</button>
+      </div>
+
+      <div id="prod-tab-content"></div>
+    </div>
+
+    <div class="prod-modal" id="prod-modal">
+      <div class="prod-modal-box" id="prod-modal-body"></div>
+    </div>`;
+
+  await prodLoadData(clienteId);
+}
+
+async function prodLoadData(clienteId) {
+  try {
+    const hoy = new Date().toISOString().slice(0,10);
+    const [lineas, registros] = await Promise.all([
+      api(`prod_lineas?cliente_id=eq.${clienteId}&activo=eq.true&order=nombre.asc&select=*`),
+      api(`prod_registros?cliente_id=eq.${clienteId}&order=fecha.desc,created_at.desc&limit=200&select=*`)
+    ]);
+    prodLineas = lineas;
+    prodRegistros = registros;
+    prodUpdateKPIs(hoy);
+    prodRenderTab();
+  } catch(e) { console.error('Error cargando producción:', e); }
+}
+
+function prodUpdateKPIs(hoy) {
+  const hoyStr = hoy || new Date().toISOString().slice(0,10);
+  const regsHoy = prodRegistros.filter(r => r.fecha === hoyStr);
+  const eficiencias = prodRegistros.filter(r => r.eficiencia_cantidad).map(r => parseFloat(r.eficiencia_cantidad));
+  const efProm = eficiencias.length ? (eficiencias.reduce((a,b) => a+b, 0) / eficiencias.length).toFixed(1) : '—';
+  const totalProd = prodRegistros.reduce((s,r) => s + parseFloat(r.cantidad_real || 0), 0).toFixed(0);
+  const totalDescarte = prodRegistros.reduce((s,r) => s + parseFloat(r.descarte || 0), 0).toFixed(0);
+
+  const kh = document.getElementById('pkpi-hoy');
+  const ke = document.getElementById('pkpi-ef');
+  const kp = document.getElementById('pkpi-prod');
+  const kd = document.getElementById('pkpi-descarte');
+  if(kh) kh.textContent = regsHoy.length;
+  if(ke) ke.textContent = efProm !== '—' ? efProm + '%' : '—';
+  if(kp) kp.textContent = totalProd;
+  if(kd) kd.textContent = totalDescarte;
+}
+
+function prodSetTab(tab) {
+  prodTab = tab;
+  document.querySelectorAll('.prod-tab').forEach(t => t.classList.remove('active'));
+  const el = document.getElementById('ptab-' + tab);
+  if(el) el.classList.add('active');
+  prodRenderTab();
+}
+
+function prodRenderTab() {
+  if(prodTab === 'registros') prodRenderRegistros();
+  else if(prodTab === 'lineas') prodRenderLineas();
+}
+
+// ── RENDER REGISTROS ──
+function prodRenderRegistros() {
+  if(!prodRegistros.length) {
+    document.getElementById('prod-tab-content').innerHTML = `
+      <div style="text-align:center;padding:60px;color:var(--text2)">
+        <div style="font-size:48px;margin-bottom:16px">🏭</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:8px">Sin registros de producción</div>
+        <button class="prod-btn primary" onclick="prodNuevoRegistro()">+ Nuevo registro</button>
+      </div>`;
+    return;
+  }
+
+  const turnoLabel = { manana:'🌅 Mañana', tarde:'🌆 Tarde', noche:'🌙 Noche' };
+
+  const rows = prodRegistros.map(r => {
+    const ef = parseFloat(r.eficiencia_cantidad);
+    let efBadge = '—';
+    if (!isNaN(ef)) {
+      const cls = ef >= 90 ? 'ef-alta' : ef >= 70 ? 'ef-media' : 'ef-baja';
+      efBadge = `<span class="${cls}">${ef.toFixed(1)}%</span>`;
+    }
+    return `<tr style="cursor:pointer" onclick="prodVerRegistro('${r.id}')">
+      <td>${r.fecha}</td>
+      <td>${turnoLabel[r.turno] || r.turno}</td>
+      <td style="font-weight:600">${r.linea_nombre}</td>
+      <td>${r.producto_descripcion}${r.producto_marca ? ' — '+r.producto_marca : ''}</td>
+      <td style="text-align:right">${parseFloat(r.cantidad_teorica).toFixed(0)}</td>
+      <td style="text-align:right;color:#10b981;font-weight:600">${parseFloat(r.cantidad_real).toFixed(0)}</td>
+      <td style="text-align:right;color:${parseFloat(r.diferencia)>0?'#ef4444':'#10b981'}">${parseFloat(r.diferencia||0).toFixed(0)}</td>
+      <td style="text-align:right;color:#f59e0b">${parseFloat(r.reproceso||0).toFixed(0)}</td>
+      <td style="text-align:right;color:#ef4444">${parseFloat(r.descarte||0).toFixed(0)}</td>
+      <td>${efBadge}</td>
+      <td>${r.personas}</td>
+      <td>${r.horas_trabajadas}h</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('prod-tab-content').innerHTML = `
+    <div class="prod-table-wrap">
+      <div class="prod-toolbar">
+        <input class="prod-search" placeholder="Buscar por línea, producto..." oninput="prodFiltrar(this.value)"/>
+      </div>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr>
+          <th>Fecha</th><th>Turno</th><th>Línea</th><th>Producto</th>
+          <th style="text-align:right">Teórico</th><th style="text-align:right">Real</th>
+          <th style="text-align:right">Dif.</th><th style="text-align:right">Reproceso</th>
+          <th style="text-align:right">Descarte</th><th>Eficiencia</th>
+          <th>Personas</th><th>Horas</th>
+        </tr></thead>
+        <tbody id="prod-tbody">${rows}</tbody>
+      </table>
+      </div>
+    </div>`;
+}
+
+function prodFiltrar(q) {
+  const ql = q.toLowerCase();
+  const turnoLabel = { manana:'mañana', tarde:'tarde', noche:'noche' };
+  const regs = ql ? prodRegistros.filter(r =>
+    r.linea_nombre.toLowerCase().includes(ql) ||
+    r.producto_descripcion.toLowerCase().includes(ql) ||
+    (r.producto_marca||'').toLowerCase().includes(ql)
+  ) : prodRegistros;
+
+  const rows = regs.map(r => {
+    const ef = parseFloat(r.eficiencia_cantidad);
+    const efBadge = !isNaN(ef) ? `<span class="${ef>=90?'ef-alta':ef>=70?'ef-media':'ef-baja'}">${ef.toFixed(1)}%</span>` : '—';
+    return `<tr style="cursor:pointer" onclick="prodVerRegistro('${r.id}')">
+      <td>${r.fecha}</td><td>${r.turno}</td><td>${r.linea_nombre}</td>
+      <td>${r.producto_descripcion}</td>
+      <td style="text-align:right">${parseFloat(r.cantidad_teorica).toFixed(0)}</td>
+      <td style="text-align:right;color:#10b981;font-weight:600">${parseFloat(r.cantidad_real).toFixed(0)}</td>
+      <td style="text-align:right;color:${parseFloat(r.diferencia)>0?'#ef4444':'#10b981'}">${parseFloat(r.diferencia||0).toFixed(0)}</td>
+      <td style="text-align:right;color:#f59e0b">${parseFloat(r.reproceso||0).toFixed(0)}</td>
+      <td style="text-align:right;color:#ef4444">${parseFloat(r.descarte||0).toFixed(0)}</td>
+      <td>${efBadge}</td><td>${r.personas}</td><td>${r.horas_trabajadas}h</td>
+    </tr>`;
+  }).join('');
+
+  const tbody = document.getElementById('prod-tbody');
+  if(tbody) tbody.innerHTML = rows || '<tr><td colspan="12" class="empty">Sin resultados</td></tr>';
+}
+
+// ── RENDER LÍNEAS ──
+function prodRenderLineas() {
+  const cards = prodLineas.length ? prodLineas.map(l => {
+    const regs = prodRegistros.filter(r => r.linea_id === l.id);
+    const eficiencias = regs.filter(r => r.eficiencia_cantidad).map(r => parseFloat(r.eficiencia_cantidad));
+    const efProm = eficiencias.length ? (eficiencias.reduce((a,b)=>a+b,0)/eficiencias.length).toFixed(1) : '—';
+    return `<div class="prod-linea-card">
+      <div style="font-size:18px;font-weight:700;margin-bottom:4px">🏭 ${l.nombre}</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:12px">${l.descripcion || 'Sin descripción'}</div>
+      <div style="display:flex;justify-content:space-between;font-size:12px">
+        <span style="color:var(--text2)">Registros: <strong style="color:var(--text)">${regs.length}</strong></span>
+        <span style="color:var(--text2)">Ef. prom: <strong style="color:#10b981">${efProm}${efProm!=='—'?'%':''}</strong></span>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="prod-btn danger" style="padding:4px 10px;font-size:11px" onclick="prodEliminarLinea('${l.id}')">Eliminar</button>
+      </div>
+    </div>`;
+  }).join('')
+    : '<div style="color:var(--text2);font-size:13px;text-align:center;padding:40px">Sin líneas registradas</div>';
+
+  document.getElementById('prod-tab-content').innerHTML = `
+    <div style="margin-bottom:16px">
+      <button class="prod-btn primary" onclick="prodNuevaLinea()">+ Nueva línea</button>
+    </div>
+    <div class="prod-lineas-grid">${cards}</div>`;
+}
+
+// ── NUEVO REGISTRO ──
+async function prodNuevoRegistro() {
+  if(!prodLineas.length) { toast('Primero agregá una línea de producción','error'); prodSetTab('lineas'); return; }
+  prodParadasTemp = [];
+  const hoy = new Date().toISOString().slice(0,10);
+  const optsLineas = prodLineas.map(l => `<option value="${l.id}">${l.nombre}</option>`).join('');
+
+  document.getElementById('prod-modal-body').innerHTML = `
+    <div class="prod-modal-title">
+      <span>🏭 Nuevo Registro de Producción</span>
+      <button class="prod-close" onclick="prodCloseModal()">✕</button>
+    </div>
+
+    <div class="prod-section" style="border-top:none;padding-top:0;margin-top:0">📅 Datos generales</div>
+    <div class="prod-grid-3">
+      <div class="prod-field"><label>Línea</label><select class="prod-input" id="pr-linea">${optsLineas}</select></div>
+      <div class="prod-field"><label>Fecha</label><input class="prod-input" id="pr-fecha" type="date" value="${hoy}"/></div>
+      <div class="prod-field"><label>Turno</label>
+        <select class="prod-input" id="pr-turno">
+          <option value="manana">🌅 Mañana</option>
+          <option value="tarde">🌆 Tarde</option>
+          <option value="noche">🌙 Noche</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="prod-section">📦 Producto</div>
+    <div class="prod-grid-2">
+      <div class="prod-field"><label>Descripción</label><input class="prod-input" id="pr-desc" placeholder="Ej: Helado Vainilla 1lt"/></div>
+      <div class="prod-field"><label>Marca</label><input class="prod-input" id="pr-marca" placeholder="Ej: Lomoro"/></div>
+    </div>
+    <div class="prod-grid-2">
+      <div class="prod-field"><label>Lote</label><input class="prod-input" id="pr-lote" placeholder="Ej: L2024001"/></div>
+      <div class="prod-field"><label>Fecha de vencimiento</label><input class="prod-input" id="pr-venc" type="date"/></div>
+    </div>
+
+    <div class="prod-section">📊 Cantidades</div>
+    <div class="prod-grid-3">
+      <div class="prod-field"><label>Cantidad teórica</label><input class="prod-input" id="pr-teorico" type="number" step="0.01" placeholder="0" oninput="prodCalcEf()"/></div>
+      <div class="prod-field"><label>Cantidad real</label><input class="prod-input" id="pr-real" type="number" step="0.01" placeholder="0" oninput="prodCalcEf()"/></div>
+      <div class="prod-field"><label>Eficiencia cantidad</label>
+        <div id="pr-ef-display" style="padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:16px;font-weight:700;text-align:center">—</div>
+      </div>
+    </div>
+    <div class="prod-grid-2">
+      <div class="prod-field"><label>Reproceso</label><input class="prod-input" id="pr-reproceso" type="number" step="0.01" placeholder="0" value="0"/></div>
+      <div class="prod-field"><label>Descarte</label><input class="prod-input" id="pr-descarte" type="number" step="0.01" placeholder="0" value="0"/></div>
+    </div>
+
+    <div class="prod-section">👷 Personal y tiempo</div>
+    <div class="prod-grid-2">
+      <div class="prod-field"><label>Personas en línea</label><input class="prod-input" id="pr-personas" type="number" placeholder="0" oninput="prodCalcEf()"/></div>
+      <div class="prod-field"><label>Horas trabajadas</label><input class="prod-input" id="pr-horas" type="number" step="0.5" placeholder="0" oninput="prodCalcEf()"/></div>
+    </div>
+    <div id="pr-ef-integral" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);margin-bottom:8px"></div>
+
+    <div class="prod-section">⚠️ Paradas de línea</div>
+    <div id="pr-paradas-list"></div>
+    <button class="prod-btn secondary" style="margin-bottom:12px" onclick="prodAgregarParada()">+ Agregar parada</button>
+
+    <div class="prod-section">📝 Observaciones</div>
+    <div class="prod-field">
+      <textarea class="prod-input prod-textarea" id="pr-obs" placeholder="Observaciones generales del turno..."></textarea>
+    </div>
+
+    <div class="prod-modal-actions">
+      <button class="prod-btn primary" onclick="prodGuardarRegistro()">Guardar registro</button>
+      <button class="prod-btn secondary" onclick="prodCloseModal()">Cancelar</button>
+    </div>`;
+
+  document.getElementById('prod-modal').classList.add('open');
+}
+
+function prodCalcEf() {
+  const teo = parseFloat(document.getElementById('pr-teorico')?.value) || 0;
+  const real = parseFloat(document.getElementById('pr-real')?.value) || 0;
+  const personas = parseInt(document.getElementById('pr-personas')?.value) || 0;
+  const horas = parseFloat(document.getElementById('pr-horas')?.value) || 0;
+
+  const efEl = document.getElementById('pr-ef-display');
+  const efIntEl = document.getElementById('pr-ef-integral');
+
+  if (teo > 0 && real >= 0) {
+    const efCant = (real / teo * 100).toFixed(1);
+    const color = efCant >= 90 ? '#10b981' : efCant >= 70 ? '#f59e0b' : '#ef4444';
+    if(efEl) { efEl.textContent = efCant + '%'; efEl.style.color = color; }
+
+    // Eficiencia integral si hay personas y horas
+    if (personas > 0 && horas > 0 && teo > 0) {
+      const prodPorPersonaHora = (real / (personas * horas)).toFixed(2);
+      const teoPorPersonaHora = (teo / (personas * horas)).toFixed(2);
+      const efPersonas = (real / teo * 100).toFixed(1);
+      if(efIntEl) {
+        efIntEl.style.display = 'block';
+        efIntEl.innerHTML = `
+          <div style="display:flex;gap:20px;flex-wrap:wrap">
+            <span>Ef. cantidad: <strong style="color:${color}">${efCant}%</strong></span>
+            <span>Prod/persona/hora: <strong style="color:#00d4ff">${prodPorPersonaHora}</strong></span>
+            <span>Teórico/persona/hora: <strong style="color:#8b5cf6">${teoPorPersonaHora}</strong></span>
+          </div>`;
+      }
+    }
+  } else {
+    if(efEl) { efEl.textContent = '—'; efEl.style.color = 'var(--text2)'; }
+    if(efIntEl) efIntEl.style.display = 'none';
+  }
+}
+
+// ── PARADAS ──
+function prodAgregarParada() {
+  document.getElementById('prod-modal-body').innerHTML = `
+    <div class="prod-modal-title">
+      <span>⚠️ Agregar Parada de Línea</span>
+      <button class="prod-close" onclick="prodVolverARegistro()">✕</button>
+    </div>
+    <div class="prod-field"><label>Descripción de la parada</label>
+      <textarea class="prod-input prod-textarea" id="pp-desc" placeholder="Ej: Falla en compresor, falta de materia prima..."></textarea>
+    </div>
+    <div class="prod-grid-2">
+      <div class="prod-field"><label>Tiempo (minutos)</label>
+        <input class="prod-input" id="pp-tiempo" type="number" placeholder="0"/>
+      </div>
+      <div class="prod-field"><label>Tipo</label>
+        <select class="prod-input" id="pp-tipo">
+          <option value="mecanica">🔧 Mecánica</option>
+          <option value="electrica">⚡ Eléctrica</option>
+          <option value="proceso">🔄 Proceso</option>
+          <option value="otra">📋 Otra</option>
+        </select>
+      </div>
+    </div>
+    <div class="prod-field">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="checkbox" id="pp-mant" style="accent-color:#8b5cf6"/>
+        Generar solicitud de mantenimiento para esta parada
+      </label>
+    </div>
+    <div class="prod-modal-actions">
+      <button class="prod-btn primary" onclick="prodConfirmarParada()">Agregar parada</button>
+      <button class="prod-btn secondary" onclick="prodVolverARegistro()">Cancelar</button>
+    </div>`;
+}
+
+function prodConfirmarParada() {
+  const desc = document.getElementById('pp-desc').value.trim();
+  const tiempo = parseInt(document.getElementById('pp-tiempo').value) || 0;
+  const tipo = document.getElementById('pp-tipo').value;
+  const generaMant = document.getElementById('pp-mant').checked;
+
+  if(!desc) { toast('Describí la parada','error'); return; }
+  if(!tiempo) { toast('Ingresá el tiempo de parada','error'); return; }
+
+  prodParadasTemp.push({ desc, tiempo, tipo, generaMant });
+  prodVolverARegistro();
+  toast('✅ Parada agregada');
+}
+
+function prodVolverARegistro() {
+  prodNuevoRegistroRestore();
+}
+
+function prodNuevoRegistroRestore() {
+  // Re-renderizar el modal de nuevo registro con las paradas actuales
+  const paradasHtml = prodParadasTemp.map((p, i) => `
+    <div class="prod-parada-item">
+      <div class="prod-parada-desc">
+        <div>${p.desc}</div>
+        <div class="prod-parada-tipo">${p.tipo}${p.generaMant ? ' · 🔧 Genera mantenimiento' : ''}</div>
+      </div>
+      <span class="prod-parada-tiempo">⏱ ${p.tiempo} min</span>
+      <button class="prod-btn danger" style="padding:3px 8px;font-size:11px" onclick="prodQuitarParada(${i})">✕</button>
+    </div>`).join('');
+
+  const listEl = document.getElementById('pr-paradas-list');
+  if(listEl) listEl.innerHTML = paradasHtml;
+}
+
+function prodQuitarParada(idx) {
+  prodParadasTemp.splice(idx, 1);
+  prodNuevoRegistroRestore();
+}
+
+// ── GUARDAR REGISTRO ──
+async function prodGuardarRegistro() {
+  const lineaId = document.getElementById('pr-linea').value;
+  const linea = prodLineas.find(l => l.id === lineaId);
+  const fecha = document.getElementById('pr-fecha').value;
+  const turno = document.getElementById('pr-turno').value;
+  const desc = document.getElementById('pr-desc').value.trim();
+  const marca = document.getElementById('pr-marca').value.trim();
+  const lote = document.getElementById('pr-lote').value.trim();
+  const venc = document.getElementById('pr-venc').value || null;
+  const teorico = parseFloat(document.getElementById('pr-teorico').value);
+  const real = parseFloat(document.getElementById('pr-real').value);
+  const reproceso = parseFloat(document.getElementById('pr-reproceso').value) || 0;
+  const descarte = parseFloat(document.getElementById('pr-descarte').value) || 0;
+  const personas = parseInt(document.getElementById('pr-personas').value);
+  const horas = parseFloat(document.getElementById('pr-horas').value);
+  const obs = document.getElementById('pr-obs').value.trim();
+
+  if(!fecha || !desc || isNaN(teorico) || isNaN(real) || isNaN(personas) || isNaN(horas)) {
+    toast('Completá todos los campos obligatorios','error'); return;
+  }
+  if(reproceso + descarte > (teorico - real) && (teorico - real) > 0) {
+    toast('Reproceso + descarte no puede superar la diferencia','error'); return;
+  }
+
+  try {
+    const [registro] = await api('prod_registros?select=*', 'POST', {
+      cliente_id: STATE.cliente.id,
+      linea_id: lineaId,
+      linea_nombre: linea.nombre,
+      fecha, turno,
+      producto_descripcion: desc,
+      producto_marca: marca || null,
+      producto_lote: lote || null,
+      producto_vencimiento: venc,
+      cantidad_teorica: teorico,
+      cantidad_real: real,
+      reproceso, descarte,
+      personas, horas_trabajadas: horas,
+      observaciones: obs || null
+    });
+
+    // Guardar paradas
+    for(const p of prodParadasTemp) {
+      let mantId = null;
+
+      // Si genera mantenimiento, crear solicitud
+      if(p.generaMant) {
+        const clienteId = STATE.cliente.id;
+        // Obtener próximo número de solicitud
+        const contResp = await api(`mant_contadores?cliente_id=eq.${clienteId}&select=ultimo_numero`);
+        let numero = 1;
+        if(contResp.length) {
+          numero = contResp[0].ultimo_numero + 1;
+          await api(`mant_contadores?cliente_id=eq.${clienteId}`, 'PATCH', { ultimo_numero: numero });
+        } else {
+          await api('mant_contadores', 'POST', { cliente_id: clienteId, ultimo_numero: 1 });
+        }
+        const codigo = 'R-MA-' + String(numero).padStart(3,'0');
+        const [solicitud] = await api('mant_solicitudes?select=*', 'POST', {
+          cliente_id: clienteId,
+          codigo,
+          sector: linea.nombre,
+          equipo_nombre: 'Línea ' + linea.nombre,
+          equipo_numero: lineaId.slice(0,8),
+          descripcion: `Parada de línea: ${p.desc} (${p.tiempo} min)`,
+          urgencia: p.tipo === 'mecanica' || p.tipo === 'electrica' ? 'urgente' : 'normal',
+          solicitante: STATE.user.nombre,
+          estado: 'solicitada'
+        });
+        mantId = solicitud.id;
+      }
+
+      await api('prod_paradas?select=*', 'POST', {
+        cliente_id: STATE.cliente.id,
+        registro_id: registro.id,
+        descripcion: p.desc,
+        tiempo_minutos: p.tiempo,
+        tipo: p.tipo,
+        genera_mantenimiento: p.generaMant,
+        solicitud_mant_id: mantId
+      });
+    }
+
+    const paradasConMant = prodParadasTemp.filter(p => p.generaMant).length;
+    toast(`✅ Registro guardado${paradasConMant > 0 ? ` · ${paradasConMant} solicitud(es) de mantenimiento generadas` : ''}`);
+    prodParadasTemp = [];
+    prodCloseModal();
+    await prodLoadData(STATE.cliente.id);
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+// ── VER REGISTRO ──
+async function prodVerRegistro(id) {
+  const r = prodRegistros.find(x => x.id === id);
+  if(!r) return;
+
+  const paradas = await api(`prod_paradas?registro_id=eq.${id}&select=*`);
+  const ef = parseFloat(r.eficiencia_cantidad);
+  const efColor = !isNaN(ef) ? (ef >= 90 ? '#10b981' : ef >= 70 ? '#f59e0b' : '#ef4444') : 'var(--text2)';
+  const turnoLabel = { manana:'🌅 Mañana', tarde:'🌆 Tarde', noche:'🌙 Noche' };
+
+  const paradasHtml = paradas.map(p => `
+    <div class="prod-parada-item">
+      <div class="prod-parada-desc">
+        <div>${p.descripcion}</div>
+        <div class="prod-parada-tipo">${p.tipo}${p.genera_mantenimiento ? ' · 🔧 Solicitud de mantenimiento generada' : ''}</div>
+      </div>
+      <span class="prod-parada-tiempo">⏱ ${p.tiempo_minutos} min</span>
+    </div>`).join('');
+
+  const totalParadas = paradas.reduce((s,p) => s + p.tiempo_minutos, 0);
+  const prodPorPH = r.personas && r.horas_trabajadas ?
+    (parseFloat(r.cantidad_real) / (r.personas * parseFloat(r.horas_trabajadas))).toFixed(2) : '—';
+
+  document.getElementById('prod-modal-body').innerHTML = `
+    <div class="prod-modal-title">
+      <span>🏭 ${r.linea_nombre} — ${r.fecha}</span>
+      <button class="prod-close" onclick="prodCloseModal()">✕</button>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <span style="font-size:12px;color:#8b5cf6">${turnoLabel[r.turno]||r.turno}</span>
+      <span style="font-size:12px;color:var(--text2)">${r.producto_descripcion}${r.producto_marca?' — '+r.producto_marca:''}</span>
+      ${r.producto_lote?`<span style="font-size:12px;color:var(--text2)">Lote: ${r.producto_lote}</span>`:''}
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:16px">
+      <div class="prod-kpi"><div class="prod-kpi-label">Teórico</div><div class="prod-kpi-val cyan">${parseFloat(r.cantidad_teorica).toFixed(0)}</div></div>
+      <div class="prod-kpi"><div class="prod-kpi-label">Real</div><div class="prod-kpi-val green">${parseFloat(r.cantidad_real).toFixed(0)}</div></div>
+      <div class="prod-kpi"><div class="prod-kpi-label">Diferencia</div><div class="prod-kpi-val ${parseFloat(r.diferencia)>0?'red':'green'}">${parseFloat(r.diferencia||0).toFixed(0)}</div></div>
+      <div class="prod-kpi"><div class="prod-kpi-label">Reproceso</div><div class="prod-kpi-val yellow">${parseFloat(r.reproceso||0).toFixed(0)}</div></div>
+      <div class="prod-kpi"><div class="prod-kpi-label">Descarte</div><div class="prod-kpi-val red">${parseFloat(r.descarte||0).toFixed(0)}</div></div>
+      <div class="prod-kpi"><div class="prod-kpi-label">Eficiencia</div><div class="prod-kpi-val" style="color:${efColor}">${!isNaN(ef)?ef.toFixed(1)+'%':'—'}</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;font-size:13px">
+      <div style="background:var(--bg3);border-radius:8px;padding:12px;text-align:center">
+        <div style="color:var(--text2);font-size:10px;text-transform:uppercase;margin-bottom:4px">Personas</div>
+        <div style="font-size:20px;font-weight:700;color:#00d4ff">${r.personas}</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:12px;text-align:center">
+        <div style="color:var(--text2);font-size:10px;text-transform:uppercase;margin-bottom:4px">Horas</div>
+        <div style="font-size:20px;font-weight:700;color:#8b5cf6">${r.horas_trabajadas}h</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:12px;text-align:center">
+        <div style="color:var(--text2);font-size:10px;text-transform:uppercase;margin-bottom:4px">Prod/Persona/Hora</div>
+        <div style="font-size:20px;font-weight:700;color:#10b981">${prodPorPH}</div>
+      </div>
+    </div>
+
+    ${paradas.length ? `
+      <div class="prod-section">⚠️ Paradas (${paradas.length} · ${totalParadas} min total)</div>
+      ${paradasHtml}` : ''}
+
+    ${r.observaciones ? `<div class="prod-section">📝 Observaciones</div><div style="font-size:13px;color:var(--text2)">${r.observaciones}</div>` : ''}
+
+    <div class="prod-modal-actions">
+      <button class="prod-btn danger" onclick="prodEliminarRegistro('${r.id}')">Eliminar</button>
+      <button class="prod-btn secondary" onclick="prodCloseModal()">Cerrar</button>
+    </div>`;
+
+  document.getElementById('prod-modal').classList.add('open');
+}
+
+async function prodEliminarRegistro(id) {
+  if(!confirm('¿Eliminar este registro?')) return;
+  try {
+    await api(`prod_paradas?registro_id=eq.${id}`, 'DELETE');
+    await api(`prod_registros?id=eq.${id}`, 'DELETE');
+    toast('Registro eliminado');
+    prodCloseModal();
+    await prodLoadData(STATE.cliente.id);
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+// ── NUEVA LÍNEA ──
+function prodNuevaLinea() {
+  document.getElementById('prod-modal-body').innerHTML = `
+    <div class="prod-modal-title">
+      <span>⚙️ Nueva Línea de Producción</span>
+      <button class="prod-close" onclick="prodCloseModal()">✕</button>
+    </div>
+    <div class="prod-field"><label>Nombre</label><input class="prod-input" id="pl-nombre" placeholder="Ej: Línea 1, Envasado, Cocina..."/></div>
+    <div class="prod-field"><label>Descripción (opcional)</label><textarea class="prod-input prod-textarea" id="pl-desc" placeholder="Descripción de la línea..."></textarea></div>
+    <div class="prod-modal-actions">
+      <button class="prod-btn primary" onclick="prodGuardarLinea()">Guardar</button>
+      <button class="prod-btn secondary" onclick="prodCloseModal()">Cancelar</button>
+    </div>`;
+  document.getElementById('prod-modal').classList.add('open');
+}
+
+async function prodGuardarLinea() {
+  const nombre = document.getElementById('pl-nombre').value.trim();
+  const desc = document.getElementById('pl-desc').value.trim();
+  if(!nombre) { toast('Ingresá el nombre de la línea','error'); return; }
+  try {
+    await api('prod_lineas?select=*', 'POST', {
+      cliente_id: STATE.cliente.id, nombre, descripcion: desc, activo: true
+    });
+    toast('✅ Línea registrada');
+    prodCloseModal();
+    await prodLoadData(STATE.cliente.id);
+    prodSetTab('lineas');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+async function prodEliminarLinea(id) {
+  if(!confirm('¿Eliminar esta línea? Los registros asociados se conservan.')) return;
+  try {
+    await api(`prod_lineas?id=eq.${id}`, 'PATCH', { activo: false });
+    toast('Línea eliminada');
+    await prodLoadData(STATE.cliente.id);
+    prodRenderLineas();
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+// ── EXPORTAR ──
+function prodExportar() {
+  if(!prodRegistros.length) { toast('Sin registros para exportar','error'); return; }
+  const bom = '\uFEFF';
+  const headers = ['Fecha','Turno','Línea','Producto','Marca','Lote','Vencimiento','Teórico','Real','Diferencia','Reproceso','Descarte','Eficiencia%','Personas','Horas','Observaciones'];
+  const rows = prodRegistros.map(r => [
+    r.fecha, r.turno, r.linea_nombre, r.producto_descripcion,
+    r.producto_marca||'', r.producto_lote||'', r.producto_vencimiento||'',
+    r.cantidad_teorica, r.cantidad_real, r.diferencia||0,
+    r.reproceso||0, r.descarte||0, r.eficiencia_cantidad||'',
+    r.personas, r.horas_trabajadas, r.observaciones||''
+  ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(','));
+
+  const csv = bom + [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `produccion_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('✅ Exportado — abrilo con Excel');
+}
+
+// ── ANÁLISIS IA ──
+async function prodAnalisisIA() {
+  const wrap = document.querySelector('.prod-wrap');
+  if(!wrap) return;
+
+  let panel = document.getElementById('prod-ai-panel');
+  if(!panel) {
+    panel = document.createElement('div');
+    panel.className = 'temp-ai-panel';
+    panel.id = 'prod-ai-panel';
+    panel.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:14px;font-weight:700;color:#8b5cf6">🤖 Análisis IA — Producción</div>
+        <button class="prod-btn secondary" style="padding:4px 10px;font-size:11px" onclick="this.parentElement.parentElement.remove()">✕</button>
+      </div>
+      <div class="temp-ai-loading" id="prod-ai-loading"><div class="mant-spinner"></div> Analizando datos de producción...</div>
+      <div class="temp-ai-response" id="prod-ai-response" style="display:none"></div>`;
+    wrap.appendChild(panel);
+  } else {
+    panel.querySelector('#prod-ai-loading').style.display = 'flex';
+    panel.querySelector('#prod-ai-response').style.display = 'none';
+  }
+
+  const eficiencias = prodRegistros.map(r => parseFloat(r.eficiencia_cantidad)).filter(e => !isNaN(e));
+  const efProm = eficiencias.length ? (eficiencias.reduce((a,b)=>a+b,0)/eficiencias.length).toFixed(1) : 0;
+  const totalDesc = prodRegistros.reduce((s,r) => s+parseFloat(r.descarte||0),0).toFixed(0);
+  const totalRep = prodRegistros.reduce((s,r) => s+parseFloat(r.reproceso||0),0).toFixed(0);
+  const porLinea = prodLineas.map(l => {
+    const regs = prodRegistros.filter(r => r.linea_id === l.id);
+    const efs = regs.map(r => parseFloat(r.eficiencia_cantidad)).filter(e => !isNaN(e));
+    return {
+      linea: l.nombre,
+      registros: regs.length,
+      eficiencia_prom: efs.length ? (efs.reduce((a,b)=>a+b,0)/efs.length).toFixed(1) : 0,
+      descarte_total: regs.reduce((s,r)=>s+parseFloat(r.descarte||0),0).toFixed(0),
+      reproceso_total: regs.reduce((s,r)=>s+parseFloat(r.reproceso||0),0).toFixed(0)
+    };
+  });
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `Sos un experto en gestión de producción industrial. Analizá los siguientes datos y generá un informe ejecutivo en español con:
+1. **Estado general de la producción**
+2. **Acciones inmediatas** (problemas urgentes a resolver)
+3. **Acciones correctivas** (mejoras a implementar)
+4. **Líneas con mejor y peor desempeño**
+5. **Proyección y recomendaciones**
+
+Datos:
+- Total registros: ${prodRegistros.length}
+- Eficiencia promedio: ${efProm}%
+- Descarte total: ${totalDesc}
+- Reproceso total: ${totalRep}
+- Por línea: ${JSON.stringify(porLinea, null, 2)}
+
+Sé concreto, usá bullet points, máximo 400 palabras.`
+        }]
+      })
+    });
+    const data = await resp.json();
+    const texto = data.content?.[0]?.text || 'No se pudo generar el análisis.';
+    panel.querySelector('#prod-ai-loading').style.display = 'none';
+    const respEl = panel.querySelector('#prod-ai-response');
+    respEl.style.display = 'block';
+    respEl.textContent = texto;
+  } catch(e) {
+    panel.querySelector('#prod-ai-loading').style.display = 'none';
+    const respEl = panel.querySelector('#prod-ai-response');
+    respEl.style.display = 'block';
+    respEl.textContent = 'Error: ' + e.message;
+  }
+}
+
+function prodCloseModal() {
+  const m = document.getElementById('prod-modal');
+  if(m) m.classList.remove('open');
+  prodParadasTemp = [];
 }
 
 </script>
