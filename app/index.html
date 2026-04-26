@@ -706,11 +706,33 @@ async function doLogin() {
 
     STATE.user = u;
 
-    if (u.rol === 'cliente') {
-      const clientes = await api(`clientes?usuario_id=eq.${u.id}&select=*`);
-      if (clientes.length) {
-        STATE.cliente = clientes[0];
-        STATE.suspended = await checkSuspension(clientes[0].id);
+    if (u.rol === 'superadmin') {
+      // Superadmin: acceso total, sin cliente asignado
+      STATE.cliente = null;
+      STATE.suspended = false;
+    } else if (u.rol === 'admin') {
+      // Admin: tiene cliente_id propio en la tabla usuarios
+      if (u.cliente_id) {
+        const clientes = await api(`clientes?id=eq.${u.cliente_id}&select=*`);
+        if (clientes.length) {
+          STATE.cliente = clientes[0];
+          STATE.suspended = await checkSuspension(clientes[0].id);
+        }
+      }
+    } else {
+      // Usuario (cliente): buscar por usuario_id en clientes o por cliente_id en usuarios
+      if (u.cliente_id) {
+        const clientes = await api(`clientes?id=eq.${u.cliente_id}&select=*`);
+        if (clientes.length) {
+          STATE.cliente = clientes[0];
+          STATE.suspended = await checkSuspension(clientes[0].id);
+        }
+      } else {
+        const clientes = await api(`clientes?usuario_id=eq.${u.id}&select=*`);
+        if (clientes.length) {
+          STATE.cliente = clientes[0];
+          STATE.suspended = await checkSuspension(clientes[0].id);
+        }
       }
     }
 
@@ -718,7 +740,8 @@ async function doLogin() {
     localStorage.setItem('iallclub_session', JSON.stringify({user: STATE.user, cliente: STATE.cliente, suspended: STATE.suspended}));
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
-    document.getElementById('topbar-user').textContent = u.nombre + ' · ' + u.rol;
+    const empresaNombre = STATE.cliente ? ` · ${STATE.cliente.empresa}` : '';
+    document.getElementById('topbar-user').textContent = u.nombre + ' · ' + u.rol + empresaNombre;
     renderSidebar();
     renderPage('dashboard');
   } catch(e) {
@@ -750,15 +773,21 @@ function doLogout() {
 // ── SIDEBAR ──────────────────────────────────────────────
 function renderSidebar() {
   const sb = document.getElementById('sidebar');
-  const isAdmin = ['superadmin','admin'].includes(STATE.user.rol);
+  const rol = STATE.user.rol;
   let html = '';
-  if (isAdmin) {
+  if (rol === 'superadmin') {
     html += `<div class="sidebar-title">Administración</div>
     <div class="nav-item" onclick="renderPage('dashboard')"><span class="icon">📊</span>Dashboard</div>
     <div class="nav-item" onclick="renderPage('clientes')"><span class="icon">👥</span>Clientes</div>
     <div class="nav-item" onclick="renderPage('pagos')"><span class="icon">💳</span>Pagos</div>
     <div class="nav-item" onclick="renderPage('admins')"><span class="icon">🔐</span>Admins</div>
+    <div class="nav-item" onclick="renderPage('subusuarios')"><span class="icon">👤</span>Sub-usuarios</div>
     <div class="nav-item" onclick="renderPage('backup')"><span class="icon">💾</span>Backup</div>`;
+  } else if (rol === 'admin') {
+    html += `<div class="sidebar-title">Mi Empresa</div>
+    <div class="nav-item" onclick="renderPage('dashboard')"><span class="icon">🏠</span>Inicio</div>
+    <div class="nav-item" onclick="renderPage('modulos')"><span class="icon">⚡</span>Módulos</div>
+    <div class="nav-item" onclick="renderPage('subusuarios')"><span class="icon">👤</span>Usuarios</div>`;
   } else {
     html += `<div class="sidebar-title">Menú</div>
     <div class="nav-item" onclick="renderPage('dashboard')"><span class="icon">🏠</span>Inicio</div>
@@ -783,12 +812,18 @@ async function renderPage(page) {
   const c = document.getElementById('content');
   c.innerHTML = '<div class="loading">⏳ Cargando...</div>';
   try {
-    if (['superadmin','admin'].includes(STATE.user.rol)) {
-      if (page === 'dashboard')  await renderAdminDashboard();
+    const rol = STATE.user.rol;
+    if (rol === 'superadmin') {
+      if (page === 'dashboard')     await renderAdminDashboard();
       else if (page === 'clientes') await renderClientes();
       else if (page === 'pagos')    await renderPagos();
       else if (page === 'admins')   await renderAdmins();
+      else if (page === 'subusuarios') await renderSubusuarios();
       else if (page === 'backup')   await renderBackup();
+    } else if (rol === 'admin') {
+      if (page === 'dashboard')     await renderClienteDashboard();
+      else if (page === 'modulos')  await renderModulos();
+      else if (page === 'subusuarios') await renderSubusuariosAdmin();
     } else {
       if (page === 'dashboard') await renderClienteDashboard();
       else if (page === 'modulos') await renderModulos();
@@ -1079,6 +1114,226 @@ async function savePago() {
   } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
+
+// ══════════════════════════════════════════════════════════
+// SUB-USUARIOS — Gestión desde superadmin y admin
+// ══════════════════════════════════════════════════════════
+
+// Vista superadmin: ve todos los usuarios tipo 'cliente' de todas las empresas
+async function renderSubusuarios() {
+  const [usuarios, clientes] = await Promise.all([
+    api("usuarios?rol=eq.cliente&select=*&order=nombre.asc"),
+    api("clientes?select=id,empresa")
+  ]);
+  const clienteMap = {};
+  clientes.forEach(c => clienteMap[c.id] = c.empresa);
+
+  const rows = usuarios.map(u => `<tr>
+    <td>${u.nombre}</td>
+    <td>${u.email}</td>
+    <td>${u.cliente_id ? clienteMap[u.cliente_id] || '—' : '—'}</td>
+    <td>${(u.modulos_habilitados || []).join(', ') || 'Todos'}</td>
+    <td><span class="badge ${u.activo ? 'green' : 'red'}">${u.activo ? 'Activo' : 'Inactivo'}</span></td>
+    <td style="display:flex;gap:6px">
+      <button class="action-btn" onclick="editSubusuario('${u.id}')">✏️ Editar</button>
+      <button class="action-btn del" onclick="toggleSubusuario('${u.id}', ${u.activo})">
+        ${u.activo ? '🚫 Desactivar' : '✅ Activar'}
+      </button>
+    </td>
+  </tr>`).join('');
+
+  document.getElementById('content').innerHTML = `
+    <div class="page-title">Sub-usuarios</div>
+    <div class="page-sub">Usuarios de cada empresa cliente</div>
+    <div style="margin-bottom:16px">
+      <button class="btn-primary" style="width:auto;padding:10px 20px" onclick="newSubusuario()">+ Nuevo sub-usuario</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Nombre</th><th>Email</th><th>Empresa</th><th>Módulos</th><th>Estado</th><th>Acciones</th>
+        </tr></thead>
+        <tbody>${rows || '<tr><td colspan="6" style="text-align:center;color:var(--text2)">Sin sub-usuarios registrados</td></tr>'}</tbody>
+      </table>
+    </div>`;
+}
+
+// Vista admin: solo ve usuarios de su empresa
+async function renderSubusuariosAdmin() {
+  const clienteId = STATE.cliente.id;
+  const usuarios = await api(`usuarios?rol=eq.cliente&cliente_id=eq.${clienteId}&select=*&order=nombre.asc`);
+  const todosModulos = ['mantenimiento','produccion','calidad','stock','comercial','camara'];
+
+  const rows = usuarios.map(u => {
+    const mods = u.modulos_habilitados || todosModulos;
+    return `<tr>
+      <td>${u.nombre}</td>
+      <td>${u.email}</td>
+      <td>${mods.join(', ')}</td>
+      <td><span class="badge ${u.activo ? 'green' : 'red'}">${u.activo ? 'Activo' : 'Inactivo'}</span></td>
+      <td><button class="action-btn" onclick="editModulosUsuario('${u.id}')">⚙️ Módulos</button></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('content').innerHTML = `
+    <div class="page-title">Usuarios de ${STATE.cliente.empresa}</div>
+    <div class="page-sub">Habilitá o deshabilitá módulos para cada usuario</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Nombre</th><th>Email</th><th>Módulos habilitados</th><th>Estado</th><th>Acción</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="5" style="text-align:center;color:var(--text2)">Sin usuarios registrados</td></tr>'}</tbody>
+      </table>
+    </div>`;
+}
+
+async function newSubusuario() {
+  const clientes = await api('clientes?select=id,empresa&order=empresa.asc');
+  const clienteOpts = clientes.map(c => `<option value="${c.id}">${c.empresa}</option>`).join('');
+  const todosModulos = ['mantenimiento','produccion','calidad','stock','comercial','camara'];
+  const modChecks = todosModulos.map(m => `
+    <label style="display:flex;align-items:center;gap:8px;padding:6px;background:var(--bg2);border-radius:6px;cursor:pointer">
+      <input type="checkbox" value="${m}" checked style="width:16px;height:16px"> 
+      <span style="text-transform:capitalize">${m}</span>
+    </label>`).join('');
+
+  showModal(`<h3>Nuevo Sub-usuario</h3>
+    <div class="form-group"><label>Nombre</label><input id="su-nombre" placeholder="Nombre completo"/></div>
+    <div class="form-group"><label>Email</label><input id="su-email" type="email" placeholder="email@empresa.com"/></div>
+    <div class="form-group"><label>Contraseña</label><input id="su-pass" type="password" placeholder="Contraseña inicial"/></div>
+    <div class="form-group"><label>Empresa</label>
+      <select id="su-cliente">${clienteOpts}</select>
+    </div>
+    <div class="form-group"><label>Módulos habilitados</label>
+      <div id="su-modulos" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">${modChecks}</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveSubusuario()">Guardar</button>
+    </div>`);
+}
+
+async function saveSubusuario() {
+  const nombre = document.getElementById('su-nombre').value.trim();
+  const email = document.getElementById('su-email').value.trim();
+  const pass = document.getElementById('su-pass').value;
+  const clienteId = document.getElementById('su-cliente').value;
+  const checks = document.querySelectorAll('#su-modulos input:checked');
+  const modulos = Array.from(checks).map(c => c.value);
+
+  if (!nombre || !email || !pass || !clienteId) { toast('Completá todos los campos', 'error'); return; }
+  if (!modulos.length) { toast('Seleccioná al menos un módulo', 'error'); return; }
+
+  try {
+    // 1. Crear en Supabase Auth
+    const { data: authData, error: authError } = await supabaseClient.auth.admin 
+      ? await supabaseClient.auth.admin.createUser({ email, password: pass, email_confirm: true })
+      : { data: null, error: { message: 'Sin permisos admin' } };
+    
+    // 2. Crear en tabla usuarios (el trigger de Auth no aplica aquí)
+    await api('usuarios?select=*', 'POST', {
+      nombre, email,
+      password_hash: pass,
+      rol: 'cliente',
+      activo: true,
+      cliente_id: clienteId,
+      modulos_habilitados: modulos
+    });
+
+    toast('✅ Sub-usuario creado');
+    closeModal();
+    renderPage('subusuarios');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+async function editSubusuario(id) {
+  const [u, clientes] = await Promise.all([
+    api(`usuarios?id=eq.${id}&select=*`),
+    api('clientes?select=id,empresa&order=empresa.asc')
+  ]);
+  const usuario = u[0];
+  const clienteOpts = clientes.map(c => 
+    `<option value="${c.id}" ${c.id === usuario.cliente_id ? 'selected' : ''}>${c.empresa}</option>`
+  ).join('');
+  const todosModulos = ['mantenimiento','produccion','calidad','stock','comercial','camara'];
+  const mods = usuario.modulos_habilitados || todosModulos;
+  const modChecks = todosModulos.map(m => `
+    <label style="display:flex;align-items:center;gap:8px;padding:6px;background:var(--bg2);border-radius:6px;cursor:pointer">
+      <input type="checkbox" value="${m}" ${mods.includes(m) ? 'checked' : ''} style="width:16px;height:16px"> 
+      <span style="text-transform:capitalize">${m}</span>
+    </label>`).join('');
+
+  showModal(`<h3>Editar Sub-usuario</h3>
+    <div class="form-group"><label>Nombre</label><input id="su-nombre" value="${usuario.nombre}"/></div>
+    <div class="form-group"><label>Email</label><input id="su-email" type="email" value="${usuario.email}" disabled style="opacity:.6"/></div>
+    <div class="form-group"><label>Empresa</label>
+      <select id="su-cliente">${clienteOpts}</select>
+    </div>
+    <div class="form-group"><label>Módulos habilitados</label>
+      <div id="su-modulos" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">${modChecks}</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="updateSubusuario('${id}')">Guardar</button>
+    </div>`);
+}
+
+async function updateSubusuario(id) {
+  const nombre = document.getElementById('su-nombre').value.trim();
+  const clienteId = document.getElementById('su-cliente').value;
+  const checks = document.querySelectorAll('#su-modulos input:checked');
+  const modulos = Array.from(checks).map(c => c.value);
+  if (!nombre || !clienteId) { toast('Completá los campos requeridos', 'error'); return; }
+  try {
+    await api(`usuarios?id=eq.${id}`, 'PATCH', {
+      nombre, cliente_id: clienteId, modulos_habilitados: modulos
+    });
+    toast('✅ Usuario actualizado');
+    closeModal();
+    renderPage('subusuarios');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+async function toggleSubusuario(id, activo) {
+  try {
+    await api(`usuarios?id=eq.${id}`, 'PATCH', { activo: !activo });
+    toast(activo ? 'Usuario desactivado' : '✅ Usuario activado');
+    renderPage('subusuarios');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+// Admin edita solo módulos de un usuario de su empresa
+async function editModulosUsuario(id) {
+  const u = await api(`usuarios?id=eq.${id}&select=*`);
+  const usuario = u[0];
+  const todosModulos = ['mantenimiento','produccion','calidad','stock','comercial','camara'];
+  const mods = usuario.modulos_habilitados || todosModulos;
+  const modChecks = todosModulos.map(m => `
+    <label style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg2);border-radius:8px;cursor:pointer">
+      <input type="checkbox" value="${m}" ${mods.includes(m) ? 'checked' : ''} style="width:16px;height:16px"> 
+      <span style="text-transform:capitalize;font-size:14px">${m}</span>
+    </label>`).join('');
+
+  showModal(`<h3>Módulos — ${usuario.nombre}</h3>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Habilitá o deshabilitá los módulos que este usuario puede ver</div>
+    <div id="su-modulos" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${modChecks}</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="guardarModulosUsuario('${id}')">Guardar</button>
+    </div>`);
+}
+
+async function guardarModulosUsuario(id) {
+  const checks = document.querySelectorAll('#su-modulos input:checked');
+  const modulos = Array.from(checks).map(c => c.value);
+  if (!modulos.length) { toast('Habilitá al menos un módulo', 'error'); return; }
+  try {
+    await api(`usuarios?id=eq.${id}`, 'PATCH', { modulos_habilitados: modulos });
+    toast('✅ Módulos actualizados');
+    closeModal();
+    renderPage('subusuarios');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
 // ── ADMINS ───────────────────────────────────────────────
 async function renderAdmins() {
   const admins = await api("usuarios?rol=in.(superadmin,admin)&select=*");
@@ -1210,8 +1465,14 @@ async function renderModulos() {
   ]);
   const contratadosIds = contratados.map(c => c.modulo_id);
 
+  // Filtrar por modulos_habilitados si es usuario (no superadmin ni admin)
+  const modulosHabilitados = STATE.user.modulos_habilitados || null;
+
   const cards = todos.map(m => {
-    const locked = !contratadosIds.includes(m.id);
+    const contratado = contratadosIds.includes(m.id);
+    // Si tiene restricción de módulos, verificar si está habilitado
+    const habilitado = !modulosHabilitados || modulosHabilitados.includes(m.nombre);
+    const locked = !contratado || !habilitado;
     const svgIcon = getModuleIcon(m.nombre);
     const iconHtml = svgIcon
       ? `<div class="mod-icon-wrap">${svgIcon}</div>`
