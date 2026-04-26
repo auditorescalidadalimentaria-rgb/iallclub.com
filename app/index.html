@@ -627,12 +627,16 @@ let STATE = { user: null, cliente: null, page: 'dashboard', moduleOpen: null, su
 // ── API helpers ──────────────────────────────────────────
 async function api(path, method='GET', body=null) {
   try {
+    // Usar token de sesión de Supabase Auth si está disponible
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    const token = session ? session.access_token : SUPA_KEY;
+
     const opts = {
       method,
       headers: {
         'Content-Type': 'application/json',
         'apikey': SUPA_KEY,
-        'Authorization': `Bearer ${SUPA_KEY}`,
+        'Authorization': `Bearer ${token}`,
         'Prefer': 'return=representation'
       }
     };
