@@ -1735,6 +1735,7 @@ async function openMantenimiento() {
       <div class="mant-tabs">
         <button class="mant-tab active" id="tab-kanban" onclick="mantSetTab('kanban')">📋 Kanban</button>
         <button class="mant-tab" id="tab-plan" onclick="mantSetTab('plan')">📅 Plan</button>
+        <button class="mant-tab" id="tab-poems" onclick="mantSetTab('poems')">📄 POEM</button>
         <button class="mant-tab" id="tab-equipos" onclick="mantSetTab('equipos')">⚙️ Equipos</button>
       </div>
 
@@ -1762,6 +1763,7 @@ async function mantLoadData(clienteId) {
     mantOrdenes = ords;
     mantEquipos = equips;
     await mantLoadPlan(clienteId);
+    await mantLoadPoems(clienteId);
     await mantCheckPlanVencimientos(clienteId);
     mantUpdateKPIs();
     mantRenderTab();
@@ -1797,6 +1799,7 @@ function mantRenderTab() {
   if(mantTab === 'kanban') mantRenderKanban();
   else if(mantTab === 'equipos') mantRenderEquipos();
   else if(mantTab === 'plan') mantRenderPlan();
+  else if(mantTab === 'poems') mantRenderPoems();
 }
 
 // ── FILTROS KANBAN ──
@@ -2478,6 +2481,101 @@ async function mantLoadPlan(clienteId) {
   } catch(e) { mantPlan = []; }
 }
 
+// ── MÓDULO POEM ──
+let mantPoems = [];
+
+async function mantLoadPoems(clienteId) {
+  try {
+    mantPoems = await api(`mant_poems?cliente_id=eq.${clienteId}&order=codigo.asc&select=*`);
+  } catch(e) { mantPoems = []; }
+}
+
+function mantRenderPoems() {
+  const cards = mantPoems.length ? mantPoems.map(p => `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;transition:.2s" onmouseover="this.style.borderColor='#00d4ff'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="background:rgba(0,212,255,.1);border-radius:10px;padding:12px;font-size:22px;flex-shrink:0">📄</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;color:var(--text2);font-family:monospace;margin-bottom:3px">${p.codigo}</div>
+        <div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.titulo}</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <a href="${p.url}" target="_blank" style="text-decoration:none">
+          <button class="mant-btn primary" style="padding:7px 14px;font-size:12px">🔗 Ver</button>
+        </a>
+        <button class="mant-btn danger" style="padding:7px 10px;font-size:12px" onclick="mantEliminarPoem('${p.id}')">🗑️</button>
+      </div>
+    </div>`).join('')
+    : `<div style="background:var(--bg2);border:1px dashed var(--border);border-radius:12px;padding:50px;text-align:center">
+        <div style="font-size:40px;margin-bottom:12px">📄</div>
+        <div style="font-size:15px;font-weight:700;margin-bottom:8px">Sin POEM cargados</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:20px">Agregá los Procedimientos Operativos de Mantenimiento</div>
+        <button class="mant-btn primary" onclick="mantAgregarPoem()">+ Agregar POEM</button>
+      </div>`;
+
+  document.getElementById('mant-tab-content').innerHTML = `
+    <div style="display:flex;gap:10px;margin-bottom:16px;align-items:center">
+      <button class="mant-btn primary" onclick="mantAgregarPoem()">+ Agregar POEM</button>
+      <span style="font-size:12px;color:var(--text2);margin-left:auto">${mantPoems.length} documento${mantPoems.length !== 1 ? 's' : ''}</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">${cards}</div>`;
+}
+
+function mantAgregarPoem() {
+  const modal = document.getElementById('mant-modal');
+  document.getElementById('mant-modal-body').innerHTML = `
+    <div class="mant-modal-title">
+      <span>📄 Agregar POEM</span>
+      <button class="mant-close" onclick="mantCloseModal()">✕</button>
+    </div>
+    <div class="mant-field">
+      <label>Código</label>
+      <input class="mant-input" id="poem-codigo" placeholder="Ej: POEM-MA-001">
+    </div>
+    <div class="mant-field">
+      <label>Título</label>
+      <input class="mant-input" id="poem-titulo" placeholder="Ej: Mantenimiento preventivo compresor frigorífico">
+    </div>
+    <div class="mant-field">
+      <label>Link del documento (Google Drive u otro)</label>
+      <input class="mant-input" id="poem-url" placeholder="https://drive.google.com/...">
+    </div>
+    <div class="mant-modal-actions">
+      <button class="mant-btn primary" onclick="mantGuardarPoem()">💾 Guardar</button>
+      <button class="mant-btn secondary" onclick="mantCloseModal()">Cancelar</button>
+    </div>`;
+  modal.classList.add('open');
+}
+
+async function mantGuardarPoem() {
+  const codigo = document.getElementById('poem-codigo').value.trim();
+  const titulo = document.getElementById('poem-titulo').value.trim();
+  const url = document.getElementById('poem-url').value.trim();
+  if (!codigo || !titulo || !url) { toast('Completá todos los campos', 'error'); return; }
+  if (!url.startsWith('http')) { toast('El link debe ser una URL válida', 'error'); return; }
+  try {
+    await api('mant_poems?select=*', 'POST', {
+      cliente_id: STATE.cliente.id,
+      codigo, titulo, url
+    });
+    toast('✅ POEM agregado');
+    mantCloseModal();
+    await mantLoadPoems(STATE.cliente.id);
+    mantRenderPoems();
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+async function mantEliminarPoem(id) {
+  const clave = prompt('🔐 Ingresá la clave para eliminar:');
+  if (clave !== 'edit2026') { toast('Clave incorrecta', 'error'); return; }
+  if (!confirm('¿Eliminar este POEM?')) return;
+  try {
+    await api(`mant_poems?id=eq.${id}`, 'DELETE');
+    toast('POEM eliminado');
+    await mantLoadPoems(STATE.cliente.id);
+    mantRenderPoems();
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
 // Verificar y crear solicitudes preventivas que vencen en 30 días
 async function mantCheckPlanVencimientos(clienteId) {
   const hoy = new Date();
@@ -2645,6 +2743,7 @@ async function mantProcesarImportPlan() {
     toast(`✅ ${ok} tareas importadas`);
     mantCloseModal();
     await mantLoadPlan(clienteId);
+    await mantLoadPoems(clienteId);
     await mantCheckPlanVencimientos(clienteId);
     await mantLoadData(clienteId);
     mantSetTab('plan');
@@ -2699,6 +2798,7 @@ async function mantGuardarItemPlan() {
     toast('✅ Tarea agregada al plan');
     mantCloseModal();
     await mantLoadPlan(clienteId);
+    await mantLoadPoems(clienteId);
     await mantCheckPlanVencimientos(clienteId);
     await mantLoadData(clienteId);
     mantSetTab('plan');
