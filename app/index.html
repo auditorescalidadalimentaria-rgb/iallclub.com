@@ -2454,7 +2454,7 @@ async function mantGenerarPDF(ordenId) {
   </div>
 
   <div class="footer" style="display:flex;justify-content:space-between;align-items:center">
-    <span>${{orden.codigo}} · ${{new Date().toLocaleDateString('es-AR')}}</span>
+    <span>${orden.codigo} · ${new Date().toLocaleDateString('es-AR')}</span>
     <span style="font-size:10px;color:#aaa">powered by <strong style="color:#00aa66">iall Club</strong></span>
   </div>
   </body></html>`;
