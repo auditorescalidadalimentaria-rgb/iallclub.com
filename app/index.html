@@ -2145,9 +2145,12 @@ async function openMantenimiento() {
         <div class="mant-kpi"><div class="mant-kpi-label">Finalizadas</div><div class="mant-kpi-val baja" id="kpi-fin">—</div></div>
         <div class="mant-kpi"><div class="mant-kpi-label">Urgentes</div><div class="mant-kpi-val urgente" id="kpi-urg">—</div></div>
         <div class="mant-kpi"><div class="mant-kpi-label">Total intervenciones</div><div class="mant-kpi-val purple" id="kpi-interv">—</div></div>
-        <div class="mant-kpi" style="grid-column:span 2;min-width:220px;display:flex;flex-direction:column;justify-content:center;padding:10px 14px" id="kpi-chart-container">
-          <div class="mant-kpi-label" style="margin-bottom:6px">Top 3 equipos intervenidos</div>
-          <canvas id="kpi-chart-top3" width="200" height="70" style="max-width:100%;display:block"></canvas>
+        <div class="mant-kpi" style="grid-column:span 2;min-width:220px;max-height:100px;overflow:hidden;display:flex;flex-direction:row;align-items:center;gap:10px;padding:10px 14px" id="kpi-chart-container">
+          <div style="flex-shrink:0">
+            <div class="mant-kpi-label" style="margin-bottom:4px;text-align:left">Top 3 equipos</div>
+            <canvas id="kpi-chart-top3" width="80" height="80" style="display:block"></canvas>
+          </div>
+          <div id="kpi-chart-legend" style="font-size:10px;line-height:1.8;overflow:hidden"></div>
         </div>
       </div>
 
@@ -2215,13 +2218,12 @@ function mantUpdateKPIs(filtradas) {
   const top3 = Object.entries(cuentas).sort((a,b) => b[1]-a[1]).slice(0,3);
   const canvas = document.getElementById('kpi-chart-top3');
   if (!canvas || !top3.length) return;
-  // Dibujar gráfico circular manual con Canvas API
   const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  ctx.clearRect(0, 0, W, H);
+  const S = canvas.width; // 80x80
+  ctx.clearRect(0, 0, S, S);
   const total = top3.reduce((s, [,v]) => s + v, 0);
   const colors = ['#00d4ff','#8b5cf6','#10b981'];
-  const cx = H/2, cy = H/2, r = H/2 - 8;
+  const cx = S/2, cy = S/2, r = S/2 - 5;
   let start = -Math.PI/2;
   top3.forEach(([label, val], i) => {
     const slice = (val/total) * Math.PI * 2;
@@ -2233,20 +2235,18 @@ function mantUpdateKPIs(filtradas) {
     ctx.fill();
     start += slice;
   });
-  // Leyenda a la derecha
-  const lx = H + 10;
-  top3.forEach(([label, val], i) => {
-    const ly = 20 + i * 32;
-    ctx.fillStyle = colors[i];
-    ctx.fillRect(lx, ly, 10, 10);
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = '10px sans-serif';
-    const short = label.length > 14 ? label.substring(0,14)+'…' : label;
-    ctx.fillText(short, lx + 14, ly + 9);
-    ctx.fillStyle = '#e2e8f0';
-    ctx.font = 'bold 11px sans-serif';
-    ctx.fillText(val + ' intervs.', lx + 14, ly + 22);
-  });
+  // Leyenda en div separado
+  const legend = document.getElementById('kpi-chart-legend');
+  if (legend) {
+    legend.innerHTML = top3.map(([label, val], i) => {
+      const short = label.length > 16 ? label.substring(0,16)+'…' : label;
+      return `<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px">
+        <span style="width:8px;height:8px;border-radius:50%;background:${colors[i]};flex-shrink:0;display:inline-block"></span>
+        <span style="color:#94a3b8;font-size:10px">${short}</span>
+        <span style="color:#e2e8f0;font-weight:700;font-size:10px;margin-left:auto">${val}</span>
+      </div>`;
+    }).join('');
+  }
 }
 
 function mantSetTab(tab) {
