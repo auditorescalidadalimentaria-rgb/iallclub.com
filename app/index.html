@@ -2145,9 +2145,9 @@ async function openMantenimiento() {
         <div class="mant-kpi"><div class="mant-kpi-label">Finalizadas</div><div class="mant-kpi-val baja" id="kpi-fin">—</div></div>
         <div class="mant-kpi"><div class="mant-kpi-label">Urgentes</div><div class="mant-kpi-val urgente" id="kpi-urg">—</div></div>
         <div class="mant-kpi"><div class="mant-kpi-label">Total intervenciones</div><div class="mant-kpi-val purple" id="kpi-interv">—</div></div>
-        <div class="mant-kpi" style="grid-column:span 2;min-width:220px" id="kpi-chart-container">
-          <div class="mant-kpi-label" style="margin-bottom:8px">Top 3 equipos intervenidos</div>
-          <canvas id="kpi-chart-top3" width="200" height="120" style="max-width:100%"></canvas>
+        <div class="mant-kpi" style="grid-column:span 2;min-width:220px;display:flex;flex-direction:column;justify-content:center;padding:10px 14px" id="kpi-chart-container">
+          <div class="mant-kpi-label" style="margin-bottom:6px">Top 3 equipos intervenidos</div>
+          <canvas id="kpi-chart-top3" width="200" height="70" style="max-width:100%;display:block"></canvas>
         </div>
       </div>
 
@@ -2379,13 +2379,13 @@ function mantRenderEquipos() {
   const filtrosHtml = `
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
     <span style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap">🔍 Filtros</span>
-    <input type="text" class="mant-input" placeholder="Nombre del equipo" style="padding:5px 8px;font-size:12px;width:160px" value="${mantEquipoFiltros.nombre}"
-      oninput="mantEquipoFiltros.nombre=this.value;mantRenderEquipos()">
-    <input type="text" class="mant-input" placeholder="Número de equipo" style="padding:5px 8px;font-size:12px;width:140px" value="${mantEquipoFiltros.numero}"
-      oninput="mantEquipoFiltros.numero=this.value;mantRenderEquipos()">
+    <input type="text" class="mant-input" id="filtro-eq-nombre" placeholder="Nombre del equipo" style="padding:5px 8px;font-size:12px;width:160px" value="${mantEquipoFiltros.nombre}"
+      oninput="mantEquipoFiltros.nombre=this.value;mantRenderEquiposLista()">
+    <input type="text" class="mant-input" id="filtro-eq-numero" placeholder="Número de equipo" style="padding:5px 8px;font-size:12px;width:140px" value="${mantEquipoFiltros.numero}"
+      oninput="mantEquipoFiltros.numero=this.value;mantRenderEquiposLista()">
     <select class="mant-input" style="padding:5px 8px;font-size:12px;width:150px" onchange="mantEquipoFiltros.sector=this.value;mantRenderEquipos()">${sectorOpts}</select>
     <button class="mant-btn secondary" style="padding:5px 10px;font-size:11px" onclick="mantEquipoFiltros={nombre:'',numero:'',sector:''};mantRenderEquipos()">✕ Limpiar</button>
-    <span style="font-size:11px;color:var(--text2);margin-left:auto">${equiposFiltrados.length} de ${mantEquipos.length} equipos</span>
+    <span style="font-size:11px;color:var(--text2);margin-left:auto" id="filtro-eq-count">${equiposFiltrados.length} de ${mantEquipos.length} equipos</span>
   </div>`;
 
   const html = equiposFiltrados.length ? equiposFiltrados.map(e => {
@@ -2414,7 +2414,39 @@ function mantRenderEquipos() {
       <button class="mant-btn primary" onclick="mantNuevoEquipo()">+ Agregar equipo</button>
     </div>
     ${filtrosHtml}
-    <div>${html}</div>`;
+    <div id="mant-equipo-lista">${html}</div>`;
+}
+
+function mantRenderEquiposLista() {
+  const equiposFiltrados = mantEquipos.filter(e => {
+    const matchNombre = !mantEquipoFiltros.nombre || (e.nombre || '').toLowerCase().includes(mantEquipoFiltros.nombre.toLowerCase());
+    const matchNumero = !mantEquipoFiltros.numero || (e.numero || '').toString().toLowerCase().includes(mantEquipoFiltros.numero.toLowerCase());
+    const matchSector = !mantEquipoFiltros.sector || mantEquipoFiltros.sector === 'todos' || (e.sector || '') === mantEquipoFiltros.sector;
+    return matchNombre && matchNumero && matchSector;
+  });
+  const count = document.getElementById('filtro-eq-count');
+  if (count) count.textContent = equiposFiltrados.length + ' de ' + mantEquipos.length + ' equipos';
+  const lista = document.getElementById('mant-equipo-lista');
+  if (!lista) return;
+  lista.innerHTML = equiposFiltrados.length ? equiposFiltrados.map(e => {
+    const intervenciones = mantSolicitudes.filter(s =>
+      s.equipo_nombre === e.nombre && s.equipo_numero == e.numero
+    ).length;
+    return `
+    <div style="display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:8px;transition:.2s;cursor:pointer"
+      onmouseover="this.style.borderColor='#00d4ff'" onmouseout="this.style.borderColor='var(--border)'"
+      onclick="mantVerHistorialEquipo('${e.id}')" title="Ver historial">
+      <span style="font-size:18px">⚙️</span>
+      <span style="font-size:13px;font-weight:600;min-width:140px">${e.nombre}</span>
+      <span style="font-size:11px;color:var(--text2);font-family:monospace;min-width:60px">#${e.numero}</span>
+      <span style="font-size:11px;color:#00d4ff;min-width:100px">${e.sector || 'Sin sector'}</span>
+      <span style="font-size:11px;color:var(--text2);flex:1">${intervenciones} intervención${intervenciones !== 1 ? 'es' : ''}</span>
+      <div style="display:flex;gap:6px" onclick="event.stopPropagation()">
+        <button class="mant-btn secondary" style="padding:4px 10px;font-size:11px" onclick="mantEditarEquipo('${e.id}')">✏️ Editar</button>
+        <button class="mant-btn danger" style="padding:4px 10px;font-size:11px" onclick="mantEliminarEquipoConClave('${e.id}')">🗑️ Eliminar</button>
+      </div>
+    </div>`;
+  }).join('') : '<div style="color:var(--text2);font-size:13px;text-align:center;padding:40px">Sin equipos que coincidan con los filtros</div>';
 }
 
 // ── HISTORIAL DE EQUIPO ──
